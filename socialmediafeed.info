@@ -1,0 +1,5 @@
+name = SocialMediaFeed
+description = "Creates a block on the site that will display your Facebook, Twitter, Youtube, or Foursquare feed using their APIs."
+core = 6.x
+php = 5.1
+package = Social Media

@@ -1,0 +1,104 @@
+#socialmediafeed {
+  height:443px; 
+  padding:0 0 10px 0; 
+  margin:0; 
+}
+
+#socialmediafeed p {
+  font-size:12px; 
+  margin-bottom:7px; 
+  margin-top:0px; 
+}
+
+#socialmediafeed .fbitem, #socialmediafeed .twitem, #socialmediafeed .fsitem {
+  margin-bottom:20px; 
+  padding:0px !important; 
+}
+
+#socialmediafeed .fbitem a {
+  color:#3b5998; 
+  font-weight:bold; 
+  text-decoration:none; 
+}
+
+#socialmediafeed .fbitem .messagehead {
+  color:#3b5998; 
+  font-weight:bold; 
+}
+
+#socialmediafeed .fbitem .messagebody {
+  color:#959595; 
+}
+
+#socialmediafeed .fbitem .socialmessage {
+  padding-left:10px; 
+  border-left:solid 1px #ccc; 
+}
+
+#socialmediafeed .twitem a {
+  color:#2eb7e4; 
+}
+
+#socialmediafeed .fsitem a {
+  color:#3b5998; 
+  font-weight:bold; 
+}
+
+#socialmediafeed .socialtitle {
+  margin-bottom:5px; 
+  height:23px; 
+  text-align:right; 
+}
+
+#socialmediafeed .socialtitle span {
+  font-size:11px; 
+  font-style:italic; 
+  font-weight:bold; 
+}
+
+#socialmediafeed .socialtitle.bpfacebook span {
+  color:#3b5998; 
+}
+
+#socialmediafeed .socialtitle.bptwitter span {
+  color:#2185a6; 
+}
+
+#socialmediafeed .socialtitle.bpyoutube span {
+  color:#a02323; 
+}
+
+#socialmediafeed .socialtitle.bpfacebook {
+  background:url('../images/facebookfeedhead.gif') no-repeat; 
+  background-color:#e1e6f3; 
+  padding-right:10px; 
+}
+
+#socialmediafeed .socialtitle.bptwitter {
+  background:url('../images/twitterfeedhead.gif') no-repeat; 
+  background-color:#ddeef6; 
+  padding-right:10px; 
+}
+
+#socialmediafeed .socialtitle.bpyoutube {
+  background:url('../images/youtubefeedhead.gif') no-repeat; 
+  background-color:#f5e7e7; 
+  padding-right:10px; 
+}
+
+#socialmediafeed .socialtitle.bpfoursaquare {
+  background:url('../images/foursquarefeedhead.gif') no-repeat; 
+  background-color:#dfebbd; 
+  padding-right:10px; 
+}
+
+#socialmediafeed p.socialdate {
+  text-align:right; 
+  font-size:10px; 
+  color:#959595; 
+}
+
+#socialmediafeed .asmediaimg {
+  margin: 0px 4px 4px 0px; 
+  border: solid 4px white; 
+}

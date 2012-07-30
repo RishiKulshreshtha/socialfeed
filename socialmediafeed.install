@@ -1,0 +1,186 @@
+<?php
+/**
+ * @file
+ * Install, update and uninstall functions for the XXX module.
+ */
+
+/**
+ * Implements hook_requirements().
+ */
+function socialmediafeed_requirements($phase) {
+  $requirements = array();
+  $t = get_t();
+
+  if ($phase == 'runtime') {
+    if (in_array('SimpleXML', get_loaded_extensions())) {
+      $requirements['socialmediafeed_simplexml'] = array(
+        'title' =>  t('SimpleXML'),
+        'value' => 'SimpleXML is installed.',
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+  }
+
+  if ($phase == 'install') {
+    if (in_array('SimpleXML', get_loaded_extensions())) {
+      $requirements['socialmediafeed'] = array(
+        'title' =>  t('SimpleXML'),
+        'value' => 'All dependencies are installed.',
+        'severity' => REQUIREMENT_OK,
+      );
+    }
+    else {
+      $requirements['socialmediafeed'] = array(
+        'title' =>  t('Not installed.'),
+        'severity' => REQUIREMENT_ERROR,
+        'description' => t('Please install the SimpleXML extension before installing the Social Media Feed.'),
+      );
+    }
+  }
+
+  return $requirements;
+
+}
+
+/**
+ * Implements hook_schema().
+ */
+function socialmediafeed_schema() {
+  $schema['socialmediafeed_post'] = array(
+    'description' => 'Stores all data for the feed.',
+    'fields' => array(
+      'post_id' => array(
+        'description' => 'Auto incremented ID.',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'id' => array(
+        'description' => 'This is the id for the post.',
+        'type' => 'varchar',
+        'length' => '600',
+        'not null' => TRUE,
+      ),
+      'time' => array(
+        'description' => 'Created date for the post.',
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'message' => array(
+        'description' => 'Message posted.',
+        'type' => 'text',
+        'size' => 'big',
+        'not null' => TRUE,
+      ),
+      'fbtype' => array(
+        'description' => 'This field will dictate the layout for Facebook posts.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+      ),
+      'picture' => array(
+        'description' => 'Image included in the post.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+      ),
+      'link' => array(
+        'description' => 'Url of the post.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+      ),
+      'name' => array(
+        'description' => 'Name of the author.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+      ),
+      'description' => array(
+        'description' => 'An additional message field.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+      ),
+      'venue' => array(
+        'description' => 'Name of the Foursquare venue',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'city' => array(
+        'description' => 'City where the post was made.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'state' => array(
+        'description' => 'State where the post was made.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+      ),
+      'title' => array(
+        'description' => 'Title of the post.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'post_type' => array(
+        'description' => 'Tells if this post is from Facebook, Twitter, Youtube, or Foursquare',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'shout' => array(
+        'description' => 'Shout posted. This is for Foursquare.',
+        'type' => 'varchar',
+        'length' => '200',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'primary key' => array('post_id'),
+      'indexes' => array(
+        'timekey' => array('time'),
+      ),
+  );
+
+  return $schema;
+}
+
+/**
+ * Implements hook_install().
+ */
+function socialmediafeed_install() {
+  drupal_install_schema('socialmediafeed');
+}
+
+
+/**
+ * Implements hook_uninstall().
+ */
+function socialmediafeed_uninstall() {
+  variable_del('socialmediafeed_facebook_profile_id');
+  variable_del('socialmediafeed_facebook_app_id');
+  variable_del('socialmediafeed_facebook_app_secret');
+  variable_del('socialmediafeed_twitter_profile_id');
+  variable_del('socialmediafeed_youtube_profile_name');
+  variable_del('socialmediafeed_foursquare_access_token');
+  variable_del('socialmediafeed_title');
+  variable_del('socialmediafeed_displaycount');
+  variable_del('socialmediafeed_facebook_title_checkbox');
+  variable_del('socialmediafeed_facebook_title');
+  variable_del('socialmediafeed_twitter_title_checkbox');
+  variable_del('socialmediafeed_twitter_title');
+  variable_del('socialmediafeed_youtube_title_checkbox');
+  variable_del('socialmediafeed_youtube_title');
+  variable_del('socialmediafeed_foursquare_title_checkbox');
+  variable_del('socialmediafeed_foursquare_title');
+
+  drupal_uninstall_schema('socialmediafeed');
+}
