@@ -1,4 +1,7 @@
 name = Social Feed
-description = "Creates a block on the site that will display your Facebook, Twitter, Youtube, or Foursquare feed using their APIs."
-core = 6.x
-package = Social Media
+description = Provides user an option to easily fetch feeds from Facebook, Twitter or Instagram and then display them accordingly using block.
+core = 7.x
+package = Social
+configure = admin/config/services/socialfeed
+dependencies[] = libraries (>=7.x-2.0)
+dependencies[] = xautoload (>=7.x-2.x-dev)

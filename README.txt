@@ -1,55 +1,110 @@
---- SocialMediaFeed ---
+CONTENTS OF THIS FILE
+---------------------
+   
+ * Introduction
+ * Dependencies
+ * Requirements
+ * Installation
+ * Configuration
+ * Maintainers
 
-This module creates a block on the site that will display your Facebook,
-Twitter, Youtube, or Foursquare feed using their APIs.
+INTRODUCTION
+------------
 
---- Installation ---
+ - Social Feed module provides the user to fetch the data from their respective
+ Facebook, Twitter, and Instagram profiles and then display them accordingly as
+ per their requirement using the Drupal block system.
 
-To install place the SocialMediaFeed folder in the sites/all/modules directory
-of your Drupal site. Then, visit http://example.com/admin/build/modules to
-enable the module.
+ - PHP SDK for Facebook APIs will allow you to display particular post types,
+ pictures, videos of your posts also the date of your post with
+ provision to provide number of count.
 
---- Configuration ---
+ - PHP SDK for Instagram APIs will allow you to display pictures from your
+ instagram profile with provision to provide number of count to be displayed also
+ provision to select the resolution of the image with options
 
-Visit http://example.com/admin/settings/socialmediafeed. Here you configure
-your feed.
+ - PHP SDK for Twitter APIs will allow you get the latest tweets with date
+ of your format and provision to provide number of count. Twitter APIs will
+ not work locally but only on live sites.
 
-1. Facebook
+ - This module is easy and simple to install and use if the project page
+ description or the README.txt file is followed correctly.
 
-Facebook requires you to create an application to retrieve an access token. Go
-to http://www.facebook.com/developers/ and create an application with the
-default settings. Copy and paste the App ID and App Secret from your Facebook
-application into the corresponding fields on your Drupal site. After that,
-paste the ID of the Facebook user you want the feed to pull data from.
+ - This module is highly recommended for the developers and not for the
+ non-developers as the default layout of the blocks is plain and in simple text;
+ hence if you're aware of working with CSS then this module will work you like a
+ charm.
+ 
+DEPENDENCIES
+------------
 
-2. Twitter
+ - Libraries API 2 - https://www.drupal.org/project/libraries
+ - X Autoload - https://www.drupal.org/project/xautoload
 
-With Twitter, you need to place either the Twitter ID or Twitter User Name.
-Just place this in the Profile ID field in the Twitter field set.
+REQUIREMENTS
+------------
 
-3. Youtube
+ - PHP 5.4
+ - PHP Curl Extension
+ - Facebook PHP SDK 4 - http://git.io/AM4F
+ - Twitter API PHP - http://git.io/AM4x
+ - jQInstaPics (Instagram) - http://git.io/AM4j
 
-Youtube requires a username so once you retrieve that, place it in the Profile
-Name field in the Youtube section.
+INSTALLATION
+------------
 
-4. Foursquare
+The Social Feed module is very similar to other Drupal modules which require
+Libraries and X Autoload Module to use for the 3rd party code integration. Hence
+for installation of the Social Feed module please follow the below-mentioned
+steps:
 
-Foursquare has a different authentication process. It requires you to specify
-an access token. To retrieve this, you must create an application at
-https://foursquare.com/oauth/. Once you have that follow the instructions on
-retrieving an access token https://developer.foursquare.com/docs/oauth.html. If
-you aren't familiar with APIs and oauth, Blueprint Interactive provides an
-foursquare api token processor at
-http://www.blueprintinteractive.com/blog/foursquare-google-maps-simplified and
-follow the link that says "Click here to get your token". This is a good
-temporary solution but eventually, you should create your own application.
+ - Download and install the Libraries Module - 2.x and after the module
+ installation create a new folder called libraries under your sites/all/ folder.
+ (Creating this folder will help us to locate our 3rd party code integration.)
 
---- Enabling the Block ---
+ - Download and install the X Autoload Module
 
-This module creates a block that can be http://example.com/admin/build/block.
-This takes the data and formats it into a simple feed display.
+ - Install as usual, see https://www.drupal.org/node/1294804 for further
+ information.
 
---- Running the Cron ---
+ - For Facebook, download the compressed version of Facebook PHP SDK 4 and
+ extract the files into sites/all/libraries/facebook/
 
-This module integrates with Drupal's cron system and relies on it to routinely,
-retrieve data. For best results, your should have a cron running regularly.
+ - For Twitter, download the compressed version of Twitter API PHP and extract
+ the files into sites/all/libraries/twitter/
+
+ - For Instagram, download the compressed version of jQInstaPics and extract the
+ files into sites/all/libraries/instagram/
+
+ - Now, in your sites/all/modules/ directory download the Social Feed module
+ using GIT clone code 
+ git clone --branch 7.x-1.x http://git.drupal.org/project/socialfeed.git.
+
+ - Enable the Social Feed module.
+
+CONFIGURATION
+-------------
+
+For installing the module:
+ After enabling it, please check your admin/reports/status where there should be
+ some new options:
+ - For using Facebook: PHP SDK for Facebook APIs v4.0.16 installed
+ - For using Twitter: PHP SDK for Twitter APIs v1.1 installed
+ - For using Instagram: PHP SDK for Instagram APIs v1.0 installed
+
+For removing the module:
+ - Disable the Social Feed module.
+ - Uninstall the Social Feed module.
+ - Clear Caches.
+
+This module has menu or modifiable settings. There is configuration link for
+this which you can access at admin/config/services/socialfeed.
+
+When enabled and configured properly, this module will display the Social Feed
+form at admin/config/services/socialfeed, after this step you can use the
+blocks from Drupal system to show the feeds from their respective services.
+
+MAINTAINERS
+-----------
+
+ - Hemangi Gokhale - https://www.drupal.org/user/2008064/
