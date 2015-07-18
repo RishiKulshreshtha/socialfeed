@@ -1,709 +1,476 @@
 <?php
 /**
  * @file
- * Module for fetching data from Facebook, Twitter, Youtube, and Foursquare.
- * This module provides block content retrieved from a
+ * Provide Facebook, Twitter and Instagram.
  */
+
+/**
+ * The minimum version of PHP SDKs required.
+ */
+define('SOCIALFEED_FACEBOOK_SDK_MIN_PLUGIN_VERSION', '4.0');
+define('SOCIALFEED_TWITTER_SDK_MIN_PLUGIN_VERSION', '1.1');
+define('SOCIALFEED_INSTAGRAM_SDK_MIN_PLUGIN_VERSION', '1.0');
+
+use Facebook\FacebookSession;
+use Facebook\FacebookRequest;
+use MetzWeb\Instagram\Instagram;
+
+/**
+ * Implements hook_help().
+ */
+function socialfeed_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#socialfeed':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('The Social Feed module allows you to fetch feeds directly from Facebook, Twitter & Instagram by simply insatlling it with the dependent <a href="@url">Libraries</a> module.', array('@url' => 'http://www.drupal.org/project/libraries')) . '</p>';
+
+      return $output;
+  }
+}
+
+/**
+ * Implements hook_libraries_info().
+ */
+function socialfeed_libraries_info() {
+  $libraries = array();
+  // This array key lets Libraries API search for
+  // 'sites/all/libraries/socialfeed' directory, which should contain the
+  // entire, original extracted library.
+  $libraries['facebook'] = array(
+    // Only used in administrative UI of Libraries API.
+    'name' => 'PHP SDK for Facebook APIs',
+    'vendor url' => 'http://developers.facebook.com/',
+    'download url' => 'https://github.com/facebook/facebook-php-sdk-v4/archive/4.0-dev.zip',
+    // Optional: If, after extraction, the actual library files are contained in
+    // sites/all/libraries/socialfeed/src/Facebook,
+    // specify the relative path here.
+    'path' => 'src/Facebook',
+    // Specify arguments for the version callback. By default,
+    // libraries_get_version() takes a named argument array:
+    'version arguments' => array(
+      'file' => 'src/Facebook/FacebookRequest.php',
+      'pattern' => "/const VERSION = '([\d.]*)/",
+      'lines' => 42,
+    ),
+    'xautoload' => function ($adapter) {
+      $adapter->add('Facebook', 'src');
+    },
+    // Default list of files of the library to load. Important: Only specify
+    // third-party files belonging to the library here, not integration files of
+    // your module.
+    'files' => array(
+      // For PHP libraries, specify include files here, still relative to the
+      // library path.
+      'php' => array(
+        'autoload.php',
+      ),
+    ),
+  );
+
+  $libraries['twitter'] = array(
+    // Only used in administrative UI of Libraries API.
+    'name' => 'PHP SDK for Twitter APIs',
+    'vendor url' => 'https://dev.twitter.com/overview/api/twitter-libraries',
+    'download url' => 'https://github.com/J7mbo/twitter-api-php/archive/master.zip',
+    // Specify arguments for the version callback. By default,
+    // libraries_get_version() takes a named argument array:
+    'version arguments' => array(
+      'file' => 'TwitterAPIExchange.php',
+      'pattern' => "/v[-+]?([0-9]*\.[0-9]+|[0-9]+) API/",
+      'lines' => 4,
+    ),
+    // Default list of files of the library to load. Important: Only specify
+    // third-party files belonging to the library here, not integration files of
+    // your module.
+    'files' => array(
+      // For PHP libraries, specify include files here, still relative to the
+      // library path.
+      'php' => array(
+        'TwitterAPIExchange.php',
+      ),
+    ),
+  );
+
+  $libraries['instagram'] = array(
+    // Only used in administrative UI of Libraries API.
+    'name' => 'PHP SDK for Instagram APIs',
+    'vendor url' => 'https://github.com/cosenary/Instagram-PHP-API',
+    'download url' => 'https://github.com/cosenary/Instagram-PHP-API/archive/master.zip',
+    // Specify arguments for the version callback. By default,
+    // libraries_get_version() takes a named argument array:
+    'version arguments' => array(
+      'file' => 'src/Instagram.php',
+      'pattern' => "/@version [-+]?([0-9]*\.[0-9]+|[0-9]+)/",
+      'lines' => 14,
+    ),
+    'xautoload' => function ($adapter) {
+      $adapter->add('MetzWeb\Instagram', 'src');
+    },
+    // Default list of files of the library to load. Important: Only specify
+    // third-party files belonging to the library here, not integration files of
+    // your module.
+    'files' => array(
+      // For PHP libraries, specify include files here, still relative to the
+      // library path.
+      'php' => array(
+        'src/Instagram.php',
+      ),
+    ),
+  );
+
+  return $libraries;
+}
 
 /**
  * Implements hook_menu().
  */
 function socialfeed_menu() {
   $items = array();
-
-  $items['admin/settings/socialfeed'] = array(
-    'title' => 'Feed settings',
-    'description' => 'This is the socialfeed module settings.',
+  $items['admin/config/services/socialfeed'] = array(
+    'title' => 'Social Feed Settings',
+    'description' => 'Configure to fit clients needs',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('socialfeed_settings_form'),
-    'access callback' => 'user_access',
-    'access arguments' => array('administer social media feed'),
+    'page arguments' => array('socialfeed_facebook_settings'),
+    'access arguments' => array('administer modules'),
+    'file' => 'socialfeed.admin.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['admin/config/services/socialfeed/facebook'] = array(
+    'title' => 'Facebook',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/config/services/socialfeed/twitter'] = array(
+    'title' => 'Twitter',
+    'description' => 'Configure to fit clients needs',
+    'page arguments' => array('socialfeed_twitter_settings'),
+    'access arguments' => array('administer modules'),
+    'file' => 'socialfeed.admin.inc',
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/config/services/socialfeed/instagram'] = array(
+    'title' => 'Instagram',
+    'description' => 'Configure to fit clients needs',
+    'page arguments' => array('socialfeed_instagram_settings'),
+    'access arguments' => array('administer modules'),
+    'file' => 'socialfeed.admin.inc',
+    'type' => MENU_LOCAL_TASK,
   );
 
   return $items;
 }
 
 /**
- * Implements hook_perm().
- */
-function socialfeed_perm() {
-  return array('administer social media feed');
-}
-
-/**
- * Form constructor for the socialfeed settings form.
- *
- * Path: admin/settings/socialfeed
- */
-function socialfeed_settings_form() {
-  drupal_add_js(drupal_get_path('module', 'socialfeed') . '/js/socialfeed_form.js');
-  $form = array();
-
-  $form['socialfeed_meta_set'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Basic settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => FALSE,
-  );
-
-  $form['socialfeed_meta_set']['socialfeed_title'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Title'),
-    '#description' => t('This is the title of the person or organization represented by your feed.'),
-    '#default_value' => variable_get('socialfeed_title', FALSE),
-    '#required' => TRUE,
-  );
-
-  $form['socialfeed_meta_set']['socialfeed_displaycount'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Display count'),
-    '#description' => t('This is the number of items that will display.'),
-    '#default_value' => variable_get('socialfeed_displaycount', FALSE),
-    '#maxlength' => 3,
-    '#size' => 3,
-    '#required' => TRUE,
-  );
-
-  // Facebook Fieldset.
-  $form['socialfeed_facebook'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Facebook settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-
-  $form['socialfeed_facebook']['socialfeed_facebook_title_checkbox'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use default title'),
-    '#description' => t('This is the name that appears over each post Facebook post. If this is not defined, it will use the username of the API instead.'),
-    '#default_value' => variable_get('socialfeed_facebook_title_checkbox', FALSE),
-  );
-
-  $form['socialfeed_facebook']['socialfeed_facebook_title'] = array(
-    '#type' => 'textfield',
-    '#description' => t('Put the title of your choice here.'),
-    '#default_value' => variable_get('socialfeed_facebook_title', FALSE),
-  );
-
-  $form['socialfeed_facebook']['socialfeed_facebook_profile_id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Profile id'),
-    '#description' => t('This is the id of the Facebook profile you wish to pull data from.'),
-    '#default_value' => variable_get('socialfeed_facebook_profile_id', FALSE),
-  );
-
-  $form['socialfeed_facebook']['socialfeed_facebook_app_id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('App id'),
-    '#description' => t('This is the id of your Facebook application. This is needed to retrieve an access token.'),
-    '#default_value' => variable_get('socialfeed_facebook_app_id', FALSE),
-  );
-
-  $form['socialfeed_facebook']['socialfeed_facebook_app_secret'] = array(
-    '#type' => 'textfield',
-    '#title' => t('App secret'),
-    '#description' => t('This is the app secret of your Facebook application. This is needed to retrieve an access token.'),
-    '#default_value' => variable_get('socialfeed_facebook_app_secret', FALSE),
-  );
-
-  // Twitter Fieldset.
-  $form['socialfeed_twitter'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Twitter settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-
-  $form['socialfeed_twitter']['socialfeed_twitter_title_checkbox'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use default title'),
-    '#description' => t('This is the name that appears over each post Twitter post. If this is not defined, it will use the username of the API instead.'),
-    '#default_value' => variable_get('socialfeed_twitter_title_checkbox', FALSE),
-  );
-
-  $form['socialfeed_twitter']['socialfeed_twitter_title'] = array(
-    '#type' => 'textfield',
-    '#description' => t('Put the title of your choice here.'),
-    '#default_value' => variable_get('socialfeed_twitter_title', FALSE),
-  );
-
-  $form['socialfeed_twitter']['socialfeed_twitter_profile_id'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Profile id'),
-    '#description' => t('This is the id of the Twitter profile you wish to pull data from.'),
-    '#default_value' => variable_get('socialfeed_twitter_profile_id', FALSE),
-  );
-
-  // Youtube Fieldset.
-  $form['socialfeed_youtube'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Youtube settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-
-  $form['socialfeed_youtube']['socialfeed_youtube_title_checkbox'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use default title'),
-    '#description' => t('This is the name that appears over each post Youtube post. If this is not defined, it will use the username of the API instead.'),
-    '#default_value' => variable_get('socialfeed_youtube_title_checkbox', FALSE),
-  );
-
-  $form['socialfeed_youtube']['socialfeed_youtube_title'] = array(
-    '#type' => 'textfield',
-    '#description' => t('Put the title of your choice here.'),
-    '#default_value' => variable_get('socialfeed_youtube_title', FALSE),
-  );
-
-  $form['socialfeed_youtube']['socialfeed_youtube_profile_name'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Profile name'),
-    '#description' => t('This is the name of the Youtube profile you wish to pull data from.'),
-    '#default_value' => variable_get('socialfeed_youtube_profile_name', FALSE),
-  );
-
-  // Foursquare Fieldset.
-  $form['socialfeed_foursquare'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('Foursquare settings'),
-    '#collapsible' => TRUE,
-    '#collapsed' => TRUE,
-  );
-
-  $form['socialfeed_foursquare']['socialfeed_foursquare_title_checkbox'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Use default title'),
-    '#description' => t('This is the name that appears over each post Foursquare post. If this is not defined, it will use the username of the API instead.'),
-    '#default_value' => variable_get('socialfeed_foursquare_title_checkbox', FALSE),
-  );
-
-  $form['socialfeed_foursquare']['socialfeed_foursquare_title'] = array(
-    '#type' => 'textfield',
-    '#description' => t('Put the title of your choice here.'),
-    '#default_value' => variable_get('socialfeed_foursquare_title', FALSE),
-  );
-
-  $form['socialfeed_foursquare']['socialfeed_foursquare_access_token'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Access token'),
-    '#description' => t('This is the access token of the Foursquare profile you wish to pull data from.'),
-    '#default_value' => variable_get('socialfeed_foursquare_access_token', FALSE),
-  );
-
-  $form['submit'] = array(
-    '#type' => 'submit',
-    '#value' => t('Save settings'),
-  );
-
-  return $form;
-}
-
-/**
- * Implements form_validate().
- */
-function socialfeed_settings_form_validate(&$form, &$form_state) {
-
-  // We make sure the title is a number or a letter.
-  if (!ctype_alnum($form_state['values']['socialfeed_title'])) {
-    form_set_error('socialfeed_title', t('You can only enter letters or numbers in the title.'));
-  }
-
-  // We make sure the display count is a number greater than zero.
-  if (!is_numeric($form_state['values']['socialfeed_displaycount'])) {
-    form_set_error('socialfeed_displaycount', t('You must enter a number for the count.'));
-  }
-  elseif ($form_state['values']['socialfeed_displaycount'] < 1) {
-    form_set_error('socialfeed_displaycount', t('The count must be greater than zero.'));
-  }
-
-  // Make sure the Facebook title is a number or a letter if it is declared.
-  if ($form_state['values']['socialfeed_facebook_title'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_facebook_title'])) {
-      form_set_error('socialfeed_facebook_title', t('You can only enter letters or numbers in the custom Facebook title.'));
-    }
-  }
-
-  // Make sure the Facebook profile ID is a number if it is declared.
-  if ($form_state['values']['socialfeed_facebook_profile_id'] != '') {
-    if (!is_numeric($form_state['values']['socialfeed_facebook_profile_id'])) {
-      form_set_error('socialfeed_facebook_profile_id', t('You must enter a number for the profile ID.'));
-    }
-  }
-
-  // We make sure the Facebook App ID is a number but only if it is declared.
-  if ($form_state['values']['socialfeed_facebook_app_id'] != '') {
-    if (!is_numeric($form_state['values']['socialfeed_facebook_app_id'])) {
-      form_set_error('socialfeed_facebook_app_id', t('You must enter a number for the app id.'));
-    }
-  }
-
-  // Make sure the App Secret is a number or a letter if it is declared.
-  if ($form_state['values']['socialfeed_facebook_app_secret'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_facebook_app_secret'])) {
-      form_set_error('socialfeed_facebook_app_secret', t('You must enter an alphanumeric string for the app secret.'));
-    }
-  }
-
-  // Make sure the custom Twitter title is a number or a letter if its declared.
-  if ($form_state['values']['socialfeed_twitter_title'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_twitter_title'])) {
-      form_set_error('socialfeed_twitter_title', t('You can only enter letters or numbers in the custom Twitter title.'));
-    }
-  }
-
-  // Make sure the Twitter Profile ID is a number or a letter if its declared.
-  if ($form_state['values']['socialfeed_twitter_profile_id'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_twitter_profile_id'])) {
-      form_set_error('socialfeed_twitter_profile_id', t('You can only enter letters or numbers in the Twitter Profile ID.'));
-    }
-  }
-
-  // Make sure the Youtube title is a number or a letter if its declared.
-  if ($form_state['values']['socialfeed_youtube_title'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_youtube_title'])) {
-      form_set_error('socialfeed_youtube_title', t('You can only enter letters or numbers in the custom Youtube title.'));
-    }
-  }
-
-  // Make sure the Youtube Name is a number or a letter if its declared.
-  if ($form_state['values']['socialfeed_youtube_profile_name'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_youtube_profile_name'])) {
-      form_set_error('socialfeed_youtube_profile_name', t('You can only enter letters or numbers in the custom Youtube Profile Name.'));
-    }
-  }
-
-  // Make sure the Foursquare title is a number or a letter if its declared.
-  if ($form_state['values']['socialfeed_foursquare_title'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_foursquare_title'])) {
-      form_set_error('socialfeed_foursquare_title', t('You can only enter letters or numbers in the custom Foursquare title.'));
-    }
-  }
-
-  // Make sure the Foursquare Access Token is a number if its declared.
-  if ($form_state['values']['socialfeed_foursquare_access_token'] != '') {
-    if (!ctype_alnum($form_state['values']['socialfeed_foursquare_access_token'])) {
-      form_set_error('socialfeed_foursquare_access_token', t('You must enter an alphanumeric string for the access token.'));
-    }
-  }
-
-
-}
-
-/**
- * Implements form_submit().
- */
-function socialfeed_settings_form_submit(&$form, &$form_state) {
-
-  $socialfeed_vars = array(
-    'socialfeed_facebook_profile_id' => $form_state['values']['socialfeed_facebook_profile_id'],
-    'socialfeed_facebook_app_id' => $form_state['values']['socialfeed_facebook_app_id'],
-    'socialfeed_facebook_app_secret' => $form_state['values']['socialfeed_facebook_app_secret'],
-    'socialfeed_twitter_profile_id' => $form_state['values']['socialfeed_twitter_profile_id'],
-    'socialfeed_youtube_profile_name' => $form_state['values']['socialfeed_youtube_profile_name'],
-    'socialfeed_foursquare_access_token' => $form_state['values']['socialfeed_foursquare_access_token'],
-    'socialfeed_title' => $form_state['values']['socialfeed_title'],
-    'socialfeed_displaycount' => $form_state['values']['socialfeed_displaycount'],
-    'socialfeed_facebook_title_checkbox' => $form_state['values']['socialfeed_facebook_title_checkbox'],
-    'socialfeed_facebook_title' => $form_state['values']['socialfeed_facebook_title'],
-    'socialfeed_twitter_title_checkbox' => $form_state['values']['socialfeed_twitter_title_checkbox'],
-    'socialfeed_twitter_title' => $form_state['values']['socialfeed_twitter_title'],
-    'socialfeed_youtube_title_checkbox' => $form_state['values']['socialfeed_youtube_title_checkbox'],
-    'socialfeed_youtube_title' => $form_state['values']['socialfeed_youtube_title'],
-    'socialfeed_foursquare_title_checkbox' => $form_state['values']['socialfeed_foursquare_title_checkbox'],
-    'socialfeed_foursquare_title' => $form_state['values']['socialfeed_foursquare_title'],
-  );
-
-  foreach ($socialfeed_vars as $key => $value) {
-    variable_set($key, $value);
-  }
-
-  // Flush the table when these feeds are changed to keep data clean.
-  socialfeed_flush();
-
-  // Retrieve data.
-  if ($form_state['values']['socialfeed_facebook_profile_id'] && $form_state['values']['socialfeed_facebook_app_id'] && $form_state['values']['socialfeed_facebook_app_secret']) {
-    socialfeed_facebook();
-    drupal_set_message(t("Facebook data has been updated as needed."));
-  }
-  if ($form_state['values']['socialfeed_twitter_profile_id']) {
-    socialfeed_twitter();
-    drupal_set_message(t("Twitter data has been updated as needed."));
-  }
-  if ($form_state['values']['socialfeed_youtube_profile_name']) {
-    socialfeed_youtube();
-    drupal_set_message(t("Youtube data has been updated as needed."));
-  }
-  if ($form_state['values']['socialfeed_foursquare_access_token']) {
-    socialfeed_foursquare();
-    drupal_set_message(t("Foursquare data has been updated as needed."));
-  }
-  drupal_set_message(t("Your feed settings have been saved. Data has been change accordingly."));
-}
-
-/**
- * Flushes the cached data.
- */
-function socialfeed_flush() {
-  // Flush the all feed data.
-  $query = "TRUNCATE TABLE {socialfeed_post}";
-  $sql = db_query($query);
-}
-
-/**
- * Implements hook_cron().
- *
- * Fires hook_update_index() in all modules and cleans up dirty words (see
- * search_dirty).
- */
-function socialfeed_cron() {
-  // Retrieve our variables.
-  $facebook_profile_id = variable_get('socialfeed_facebook_profile_id', FALSE);
-  $facebook_app_id = variable_get('socialfeed_facebook_app_id', FALSE);
-  $facebook_app_secret = variable_get('socialfeed_facebook_app_secret', FALSE);
-  $twitter_profile_name = variable_get('socialfeed_twitter_profile_id', FALSE);
-  $youtube_profile_name = variable_get('socialfeed_youtube_profile_name', FALSE);
-  $foursquare_access_token = variable_get('socialfeed_foursquare_access_token', FALSE);
-
-  if ($facebook_profile_id && $facebook_app_id && $facebook_app_secret) {
-    socialfeed_facebook();
-  }
-
-  if ($twitter_profile_name) {
-    socialfeed_twitter();
-  }
-
-  if ($youtube_profile_name) {
-    socialfeed_youtube();
-  }
-
-  if ($foursquare_access_token) {
-    socialfeed_foursquare();
-  }
-}
-
-/**
- * Retrieves Data from Facebook.
- */
-function socialfeed_facebook() {
-  $profile_id = variable_get('socialfeed_facebook_profile_id', FALSE);
-  // App Info, needed for Auth.
-  $app_id = variable_get('socialfeed_facebook_app_id', FALSE);
-  $app_secret = variable_get('socialfeed_facebook_app_secret', FALSE);
-  // Retrieve auth token.
-  $authtoken = drupal_http_request("https://graph.facebook.com/oauth/access_token?type=client_cred&client_id={$app_id}&client_secret={$app_secret}", array(), 'GET', NULL, 1);
-
-  if ($authtoken->status_message == 'OK') {
-    $data = drupal_http_request("https://graph.facebook.com/{$profile_id}/feed?{$authtoken->data}", array(), 'GET', NULL, 1);
-    $data_con = $data->data;
-    $result = json_decode(str_replace("\u2019", "'", $data_con));
-
-    /**
-     * Inserts Facebook Data.
-     */
-    function socialfeed_facebook_insert($table, $data) {
-      $query = "SELECT * FROM {socialfeed_post} WHERE id = '%s'";
-      $sql = db_query_range($query, $data->id, 0, 1);
-      while ($item = db_fetch_object($sql)) {
-        $myterms[] = $item;
-      }
-
-      if (!$myterms) {
-        $post = array();
-        $post['id'] = $data->id;
-        $post['time'] = strtotime($data->created_time);
-        $post['message'] = $data->message;
-        $post['fbtype'] = $data->type;
-        $post['picture'] = $data->picture;
-        $post['link'] = $data->link;
-        $post['name'] = $data->from->name;
-        $post['description'] = $data->description;
-        $post['post_type'] = 'facebook';
-        drupal_write_record('socialfeed_post', $post);
-      }
-    }
-
-    if ($result->data) {
-      foreach ($result->data as $object) {
-        $profileid = explode('_', $object->id);
-        if ($object->from->id == $profileid[0]) {
-          socialfeed_facebook_insert("socialfeed_post", $object);
-        }
-      }
-    }
-  }
-}
-
-/**
- * Retrieves Data from Twitter.
- */
-function socialfeed_twitter() {
-  $twitterprofile = variable_get('socialfeed_twitter_profile_id', FALSE);
-  $twitter_url = "http://twitter.com/statuses/user_timeline/{$twitterprofile}.xml";
-  $buffer = drupal_http_request($twitter_url, array(), 'GET', NULL, 1);
-  if ($buffer->status_message == 'OK') {
-    libxml_use_internal_errors(TRUE);
-    try {
-      $xml = new SimpleXMLElement($buffer->data);
-    } catch (Exception $e) {
-      // Retreat!
-      return;
-    }
-    $status = $xml->status;
-
-    /**
-     * Inserts Twitter Data.
-     */
-    function socialfeed_twitter_insert($table, $data) {
-      $query = "SELECT * FROM {socialfeed_post} WHERE id = '%s'";
-      $sql = db_query_range($query, $data->id, 0, 1);
-      while ($item = db_fetch_object($sql)) {
-        $myterms[] = $item;
-      }
-
-      if (!$myterms) {
-        $post = array();
-        $post['time'] = strtotime($data->created_at);
-        $post['message'] = $data->text;
-        $post['post_type'] = 'twitter';
-        $post['id'] = $data->id;
-        $post['name'] = $data->user->screen_name;
-        drupal_write_record('socialfeed_post', $post);
-      }
-    }
-
-    if ($status) {
-      foreach ($status as $object) {
-        socialfeed_twitter_insert("socialfeed_post", $object);
-      }
-    }
-  }
-}
-
-/**
- * Retrieves Data from Youtube.
- */
-function socialfeed_youtube() {
-  $youtubeprofile = variable_get('socialfeed_youtube_profile_name', FALSE);
-  $feedurl = drupal_http_request("http://gdata.youtube.com/feeds/api/users/{$youtubeprofile}/uploads?format=5", array(), 'GET', NULL, 1);
-  if ($feedurl->status_message == 'OK') {
-    libxml_use_internal_errors(TRUE);
-    try {
-      $sxml = new SimpleXMLElement($feedurl->data);
-    } catch (Exception $e) {
-      // Retreat!
-      return;
-    }
-    /**
-     * Inserts Youtube Data.
-     */
-    function socialfeed_youtube_insert($table, $data) {
-      // Retrieve this early for the check query.
-      $arr = explode('/', $data->id);
-      $id = $arr[count($arr) - 1];
-
-      $query = "SELECT * FROM {socialfeed_post} WHERE id = '%s'";
-      $sql = db_query_range($query, $id, 0 , 1);
-      while ($item = db_fetch_object($sql)) {
-        $myterms[] = $item;
-      }
-
-      if (!$myterms) {
-        $media = $data->children('http://search.yahoo.com/mrss/');
-        $attrs = $media->group->player->attributes();
-        $watch = $attrs['url'];
-        $attrs = $media->group->thumbnail[0]->attributes();
-        $thumbnail = $attrs['url'];
-        $post = array();
-        $post['time'] = strtotime($data->published);
-        $post['message'] = $media->group->description;
-        $post['picture'] = $thumbnail;
-        $post['link'] = $watch;
-        $post['title'] = $media->group->title;
-        $post['id'] = $id;
-        $post['post_type'] = 'youtube';
-        $post['name'] = $data->author->name;
-        drupal_write_record('socialfeed_post', $post);
-      }
-    }
-
-    if ($sxml->entry) {
-      foreach ($sxml->entry as $object) {
-        socialfeed_youtube_insert("socialfeed_post", $object);
-      }
-    }
-  }
-}
-
-/**
- * Retrieves Data from Foursquare.
- */
-function socialfeed_foursquare() {
-  $foursquare_access_token = variable_get('socialfeed_foursquare_access_token', FALSE);
-  $thedata = drupal_http_request('https://api.foursquare.com/v2/users/self/checkins?oauth_token=' . $foursquare_access_token . '', array(), 'GET', NULL, 1);
-  $theuserdata = drupal_http_request('https://api.foursquare.com/v2/users/self?oauth_token=' . $foursquare_access_token . '', array(), 'GET', NULL, 1);
-  if ($thedata->status_message == 'OK' && $theuserdata->status_message == 'OK') {
-    $fq_object = json_decode(str_replace("\u2019", "'", $thedata->data));
-    $fq_userobject = json_decode(str_replace("\u2019", "'", $theuserdata->data));
-
-    /**
-     * Inserts Foursquare Data.
-     */
-    function socialfeed_foursquare_insert($table, $data, $user) {
-      $query = "SELECT * FROM {socialfeed_post} WHERE id = '%s'";
-      $sql = db_query_range($query, $data->id, 0, 1);
-      while ($item = db_fetch_object($sql)) {
-        $myterms[] = $item;
-      }
-
-      if (!$myterms) {
-        if ($data->type == 'venueless') {
-          $post = array();
-          $post['id'] = $data->id;
-          $post['venue'] = $data->location->name;
-          $post['time'] = $data->createdAt;
-          $post['shout'] = $data->shout;
-          $post['post_type'] = 'foursquare';
-          $post['name'] = $user->id;
-          $post['title'] = $user->firstName;
-        }
-        else {
-          $post = array();
-          $post['id'] = $data->id;
-          $post['venue'] = $data->venue->name;
-          $post['city'] = $data->venue->location->city;
-          $post['state'] = $data->venue->location->state;
-          $post['time'] = $data->createdAt;
-          $post['shout'] = $data->shout;
-          $post['post_type'] = 'foursquare';
-          $post['name'] = $user->id;
-          $post['title'] = $user->firstName;
-        }
-        drupal_write_record('socialfeed_post', $post);
-      }
-    }
-
-    if ($fq_object->response->checkins->items) {
-      foreach ($fq_object->response->checkins->items as $object) {
-        socialfeed_foursquare_insert("socialfeed_post", $object, $fq_userobject->response->user);
-      }
-    }
-  }
-}
-
-/**
- * Implements hook_block().
- */
-function socialfeed_block($op = 'list', $delta = 0, $edit = array()) {
-  // Adds CSS.
-  drupal_add_css(drupal_get_path('module', 'socialfeed') . '/css/socialfeed.css');
-  $feedtitle = variable_get('socialfeed_title', FALSE);
-  switch ($op) {
-    case 'list':
-      $blocks[0]['info'] = t('Social Media Feed');
-      return $blocks;
-
-    case 'view':
-      $blocks['subject'] = t($feedtitle);
-      $blocks['content'] = socialfeed_build_the_feed();
-      return $blocks;
-  }
-}
-
-/**
- * Builds the block using data based on settings.
- */
-function socialfeed_build_the_feed() {
-  $displaycount = variable_get('socialfeed_displaycount', FALSE);
-  $query = "SELECT * FROM {socialfeed_post} ORDER BY time DESC";
-  $sql = db_query_range($query, 0, $displaycount);
-  while ($item = db_fetch_object($sql)) {
-    $feeditems[] = $item;
-  }
-
-  $feedname = variable_get('socialfeed_title', FALSE);
-  $facebookprofile = variable_get('socialfeed_facebook_profile_id', FALSE);
-  $facebooknamecustom = variable_get('socialfeed_facebook_title', FALSE);
-  $twitternamecustom = variable_get('socialfeed_twitter_title', FALSE);
-  $youtubenamecustom = variable_get('socialfeed_facebook_title', FALSE);
-  $foursquarenamecustom = variable_get('socialfeed_foursquare_title', FALSE);
-
-  return theme('socialfeed_feed_structure', 'socialfeed', $feeditems, $feedname, $facebookprofile, $facebooknamecustom, $twitternamecustom, $youtubenamecustom, $foursquarenamecustom);
-}
-
-/**
  * Implements hook_theme().
  */
-function socialfeed_theme() {
+function socialfeed_theme($existing, $type, $theme, $path) {
   return array(
-    'socialfeed_feed_structure' => array('arguments' => array('element' => NULL)),
+    'socialfeed_facebook' => array(
+      'variables' => array('facebook' => NULL),
+      'template' => 'facebook',
+      'path' => drupal_get_path('module', 'socialfeed') . '/templates',
+    ),
+    'socialfeed_twitter' => array(
+      'variables' => array('twitter' => NULL),
+      'template' => 'twitter',
+      'path' => drupal_get_path('module', 'socialfeed') . '/templates',
+    ),
+    'socialfeed_instagram' => array(
+      'variables' => array('instagram_images' => NULL),
+      'template' => 'instagram',
+      'path' => drupal_get_path('module', 'socialfeed') . '/templates',
+    ),
   );
 }
 
 /**
- * Themes the block.
+ * Implements hook_block_info().
  */
-function theme_socialfeed_feed_structure($element, $feeditems, $feedname, $facebookprofile, $facebooknamecustom, $twitternamecustom, $youtubenamecustom, $foursquarenamecustom) {
+function socialfeed_block_info() {
+  $blocks = array();
+  $blocks['facebook_latest_feed'] = array(
+    'info' => t('Social Feed Facebook'),
+  );
+  $blocks['twitter_latest_feed'] = array(
+    'info' => t('Social Feed Twitter'),
+  );
+  $blocks['instagram_latest_feed'] = array(
+    'info' => t('Social Feed Instagram'),
+  );
 
-  $output = '<div id="socialfeed">';
+  return $blocks;
+}
 
-  if ($feeditems) {
-    foreach ($feeditems as $fitem) {
-      switch ($fitem->post_type) {
-      case 'facebook':
-        $output .= '<div class="fbitem">';
-        $output .= l('<div class="socialtitle bpfacebook"><span>' . ($facebooknamecustom ? check_plain($facebooknamecustom) : check_plain($fitem->name)) . '</span></div>', 'http://www.facebook.com/' . check_plain($facebookprofile) . '', array('attributes' => array('target' => '_blank'), 'html' => TRUE));
-        $output .= '<p>';
-        $output .= l(t(check_plain($fitem->name)), 'http://www.facebook.com/' . check_plain($facebookprofile) . '', array('attributes' => array('target' => '_blank'))) . ' ';
-        $output .= check_plain($fitem->message);
-        $output .= '</p>';
-        if ($fitem->picture) {
-          $output .= '<img class="asmediaimg" src="' . check_url($fitem->picture) . '">';
-        }
-        $output .= '<p class="socialdate">';
-        $output .= format_date(check_plain($fitem->time), 'custom', 'l F d, Y' );
-        $output .= '</p>';
-        $output .= '</div>';
-        break;
-
-      case 'twitter':
-        $output .= '<div class="fbitem">';
-        $output .= l('<div class="socialtitle bptwitter"><span>@' . ($twitternamecustom ? check_plain($twitternamecustom) : check_plain($fitem->name)) . '</span></div>', 'http://www.twitter.com/' . check_plain($fitem->name) . '', array('attributes' => array('target' => '_blank'), 'html' => TRUE));
-        $output .= '<p>';
-        $output .= check_plain($fitem->message);
-        $output .= '</p><p class="socialdate">';
-        $output .= format_date(check_plain($fitem->time), 'custom', 'l F d, Y' );
-        $output .= '</p>';
-        $output .= '</div>';
-        break;
-
-      case 'foursquare':
-        $output .= '<div class="fbitem">';
-        $output .= l('<div class="socialtitle bpfoursaquare"><span>' . ($foursquarenamecustom ? check_plain($foursquarenamecustom) : check_plain($fitem->title)) . '</span></div>', 'http://www.foursquare.com/user/' . check_plain($fitem->name) . '', array('attributes' => array('target' => '_blank'), 'html' => TRUE));
-        $output .= '<p>';
-        $output .= '@';
-        $output .= check_plain($fitem->venue);
-        $output .= '<br />';
-        $output .= check_plain($fitem->shout);
-        $output .= '</p><p class="socialdate">';
-        $output .= format_date(check_plain($fitem->time), 'custom', 'l F d, Y' );
-        $output .= '</p>';
-        $output .= '</div>';
-        break;
-
-      case 'youtube':
-        $output .= '<div class="fbitem">';
-        $output .= l('<div class="socialtitle bpyoutube"><span>'. ($youtubenamecustom ? check_plain($youtubenamecustom) : check_plain($fitem->name)) . '</span></div>', 'http://www.youtube.com/' . check_plain($fitem->name) . '', array('attributes' => array('target' => '_blank'), 'html' => TRUE));
-        $output .= '<p>';
-        $output .= check_plain($fitem->message);
-        $output .= '</p><p class="socialdate">';
-        $output .= format_date(check_plain($fitem->time), 'custom', 'l F d, Y' );
-        $output .= '</p>';
-        $output .= '</div>';
+/**
+ * Implements hook_block_view().
+ */
+function socialfeed_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'facebook_latest_feed':
+      $block['subject'] = '';
+      $block['content'] = socialfeed_facebook_posts();
       break;
+
+    case 'twitter_latest_feed':
+      $block['subject'] = '';
+      $block['content'] = socialfeed_twitter_posts();
+      break;
+
+    case 'instagram_latest_feed':
+      $block['subject'] = '';
+      $block['content'] = socialfeed_instagram_posts();
+      break;
+  }
+
+  return $block;
+}
+
+/**
+ * Returns HTML with feeds in required format.
+ *
+ * @param string $page_name
+ *   Array with parameters for this action: depends on the trigger.
+ */
+function socialfeed_facebook_feeds($page_name = '') {
+  $selected_type_value = $config = $message_feed = array();
+  $display_time = $display_pic = $display_video = $selected_type = $selected_type_key = $fb_type = $selected_type_value = '';
+  $config['app_id'] = variable_get('socialfeed_facebook_app_id');
+  $config['secret'] = variable_get('socialfeed_facebook_secret_key');
+  $fb_page = $page_name;
+
+  // PHP SDK 4.x
+  libraries_load('facebook');
+  FacebookSession::setDefaultApplication($config['app_id'], $config['secret']);
+  if (isset($config['app_id']) && !empty($config['app_id']) && isset($config['secret']) && !empty($config['secret'])) {
+    $session = FacebookSession::newAppSession();
+    $request = new FacebookRequest($session, 'GET', '/' . $fb_page . '/feed');
+    $response = $request->execute();
+    $graph_object = $response->getGraphObject();
+    $facebook_values = $graph_object->asArray('data');
+
+    if ($facebook_values) {
+      $display_time = variable_get('socialfeed_facebook_time_stamp');
+      $display_pic = variable_get('socialfeed_facebook_display_pic');
+      $display_video = variable_get('socialfeed_facebook_display_video');
+      $display_all_posts = variable_get('socialfeed_facebook_all_types');
+      $teaser_text = variable_get('socialfeed_facebook_teaser_text');
+      $facebook_hash_tag = variable_get('socialfeed_facebook_hashtag');
+      $selected_type = variable_get('socialfeed_facebook_post_type');
+      $selected_type_key = $selected_type;
+      $fb_type = array('link', 'status', 'photo', 'video');
+      $selected_type_value = $fb_type[$selected_type_key];
+      $i = 0;
+      $post_type_filter = $next_post_type_filter = array();
+      foreach ($facebook_values['data'] as $facebook_value) {
+        // If specific post type is selected.
+        if ($display_all_posts == 0 && $facebook_value->type == $selected_type_value) {
+          $post_type_filter[$facebook_value->type][] = $facebook_value;
+        }
+        // If all post type selected.
+        elseif ($display_all_posts == 1) {
+          $message_feed = socialfeed_facebook_data($i, $facebook_value, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag);
+          $i++;
+          if ($i == variable_get('socialfeed_facebook_no_feeds')) {
+            break;
+          }
+        }
       }
+      // Showcase of array of specific post type feeds.
+      if (array_key_exists($selected_type_value, $post_type_filter)) {
+        foreach ($post_type_filter[$selected_type_value] as $facebook_entry) {
+          $message_feed[] = socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag);
+          $i++;
+          if ($i == variable_get('socialfeed_facebook_no_feeds')) {
+            break;
+          }
+        }
+        $existing_feeds = count($post_type_filter[$selected_type_value]);
+        $remaining = variable_get('socialfeed_facebook_no_feeds') - $existing_feeds;
+        if ($existing_feeds < variable_get('socialfeed_facebook_no_feeds')) {
+          $i = 0;
+          $pager_next = $facebook_values['paging']->next;
+          $next_page_json = file_get_contents($pager_next);
+          $next_page = json_decode($next_page_json);
+          foreach ($next_page->data as $next_facebook_value) {
+            if ($display_all_posts == 0 && $next_facebook_value->type == $selected_type_value) {
+              $next_post_type_filter[$next_facebook_value->type][] = $next_facebook_value;
+            }
+          }
+          if (array_key_exists($selected_type_value, $next_post_type_filter)) {
+            foreach ($next_post_type_filter[$selected_type_value] as $facebook_entry) {
+              $message_feed[] = socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag);
+              $i++;
+              if ($i == $remaining) {
+                break;
+              }
+            }
+          }
+        }
+      }
+      else {
+        drupal_set_message(t('No related posts'), 'error');
+      }
+
+      return theme('socialfeed_facebook', array('facebook' => $message_feed));
+    }
+  }
+  else {
+    drupal_set_message(t('Please provide your credentials at the Facebook <a href="@configuration">configuration page</a>.', array('@configuration' => 'admin/config/services/socialfeed')), 'warning');
+  }
+}
+
+/**
+ * Rendering values from the Facebook feed.
+ */
+function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag) {
+  if (array_key_exists('message', $facebook_entry)) {
+    if ($facebook_entry->type == 'photo' || $display_all_posts == 0) {
+      if ($display_pic == 1) {
+        $message_feed['picture'] = $facebook_entry->picture;
+      }
+    }
+    if ($facebook_entry->type == 'video' || $display_all_posts == 0) {
+      if ($display_video == 1) {
+        $message_feed['video'] = $facebook_entry->source;
+      }
+    }
+    if (isset($facebook_entry->message)) {
+      $message_feed['message'] = substr($facebook_entry->message, 0, variable_get('socialfeed_facebook_trim_length'));
+    }
+    if (isset($teaser_text) && !empty($teaser_text)) {
+      $message_feed['full_feed_link'] = l(t($teaser_text), $facebook_entry->actions[0]->link, array('attributes' => array('target' => '_blank')));
+    }
+
+    if ($facebook_hash_tag == 1) {
+      $message_feed['message'] = preg_replace_callback(
+        '/#(\\w+)/',
+        function ($hash) {
+          return l($hash[0], 'https:facebook.com/hashtag/' . $hash[1], array('attributes' => array('target' => '_blank')));
+        },
+        $message_feed['message']
+      );
+    }
+    if ($display_time == 1) {
+      $formatted_date = new DateTime($facebook_entry->created_time);
+      $message_feed['created_stamp'] = $formatted_date->format(variable_get('socialfeed_facebook_time_format'));
+    }
+  }
+  else {
+    if ($facebook_entry->type == 'photo' || $display_all_posts == 0) {
+      if ($display_pic == 1) {
+        $message_feed['picture'] = $facebook_entry->picture;
+      }
+    }
+    if ($facebook_entry->type == 'video' || $display_all_posts == 0) {
+      if ($display_video == 1) {
+        $message_feed['video'] = $facebook_entry->source;
+      }
+    }
+    if (isset($facebook_entry->message) && !empty($facebook_entry->message)) {
+      $message_feed['message'] = substr($facebook_entry->message, 0, variable_get('socialfeed_facebook_trim_length'));
+    }
+    if (isset($teaser_text) && !empty($teaser_text)) {
+      $message_feed['full_feed_link'] = l(t($teaser_text), $facebook_entry->actions[0]->link, array('attributes' => array('target' => '_blank')));
     }
   }
 
-  $output .= '</div><br />';
-  return $output;
+  return $message_feed;
+}
+
+/**
+ * Uses socialfeed_facebook_posts() for fetching Facebook feeds.
+ */
+function socialfeed_facebook_posts() {
+  $facebook_latest = socialfeed_facebook_feeds(variable_get('socialfeed_facebook_page_name'));
+
+  return $facebook_latest;
+}
+
+/**
+ * Uses socialfeed_twitter_posts() for fetching Twitter tweets.
+ *
+ * @var array $settings
+ */
+function socialfeed_twitter_posts() {
+  $twitter_tweets = array();
+  $display_time = '';
+
+  $settings = array(
+    'oauth_access_token' => variable_get('socialfeed_twitter_access_token'),
+    'oauth_access_token_secret' => variable_get('socialfeed_twitter_access_token_secret'),
+    'consumer_key' => variable_get('socialfeed_twitter_consumer_key'),
+    'consumer_secret' => variable_get('socialfeed_twitter_consumer_secret'),
+  );
+
+  $tweets_count = variable_get('socialfeed_twitter_tweets_count');
+  $twitter_username = variable_get('socialfeed_twitter_username');
+  $url = "https://api.twitter.com/1.1/statuses/user_timeline.json";
+  $request_method = "GET";
+  $getfield = '?screen_name=' . $twitter_username . '&count=' . $tweets_count;
+  // Loading TwitterAPIExchange.
+  libraries_load('twitter');
+  $twitter = new TwitterAPIExchange($settings);
+  $twitter_values = json_decode($twitter->setGetfield($getfield)->buildOauth($url, $request_method)->performRequest(), $assoc = TRUE);
+
+  if (isset($twitter_values) && !empty($twitter_values)) {
+    if (array_key_exists('errors', $twitter_values)) {
+      if ($twitter_values["errors"][0]["message"] != "") {
+        echo "<h3>Sorry, there was a problem.</h3><p>Twitter returned the following error message:</p><p><em>" . $twitter_values[errors][0]["message"] . "</em></p>";
+        exit();
+      }
+    }
+    $display_time = variable_get('socialfeed_twitter_time_stamp');
+    foreach ($twitter_values as $key => $twitter_value) {
+      $twitter_tweets[$key]['username'] = $twitter_value['user']['screen_name'];
+      $twitter_tweets[$key]['full_username'] = 'http://twitter.com/' . $twitter_value['user']['screen_name'];
+      preg_match_all('#\bhttps?://[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/))#', $twitter_value['text'], $extra_links);
+      foreach ($extra_links[0] as $extra_link) {
+        $twitter_tweets[$key]['extra_links'][] = $extra_link;
+      }
+      $twitter_tweets[$key]['tweet'] = rtrim($twitter_value['text'], $extra_link);
+      if ($display_time == 1) {
+        $formatted_twitter_date = new DateTime($twitter_value['created_at']);
+        $twitter_tweets[$key]['twitter_date'] = $formatted_twitter_date->format(variable_get('socialfeed_twitter_time_format'));
+      }
+    }
+
+    return theme('socialfeed_twitter', array('twitter' => $twitter_tweets));
+  }
+}
+
+/**
+ * Uses socialfeed_instagram_posts() for fetching instagram pictures.
+ *
+ * @var array $images
+ */
+function socialfeed_instagram_posts() {
+  $images = array();
+  $i = 0;
+  libraries_load('instagram');
+  $instagram = new Instagram(array(
+    'apiKey'      => variable_get('socialfeed_instagram_api_key'),
+    'apiSecret'   => variable_get('socialfeed_instagram_api_secret'),
+    'apiCallback' => variable_get('socialfeed_instagram_redirect_uri'),
+  ));
+
+  if (isset($instagram->getUserMedia(variable_get('socialfeed_instagram_user_id'))->data) && !empty($instagram->getUserMedia(variable_get('socialfeed_instagram_user_id'))->data)) {
+    $instagram_objects = $instagram->getUserMedia(variable_get('socialfeed_instagram_user_id'))->data;
+    foreach ($instagram_objects as $instagram_object) {
+      $resolution = variable_get('socialfeed_instagram_picture_resolution');
+      $images[] = $instagram_object->images->$resolution->url;
+      $i++;
+      if ($i == variable_get('socialfeed_instagram_picture_count')) {
+        break;
+      }
+    }
+
+    return theme('socialfeed_instagram', array('instagram_images' => $images));
+  }
+  elseif (empty($instagram->getUserMedia(variable_get('socialfeed_instagram_user_id'))->data)) {
+    drupal_set_message(t('Please provide valid User ID at the Instagram <a href="@configuration">configuration page</a>.', array('@configuration' => 'admin/config/services/socialfeed/instagram')), 'warning');
+  }
+  else {
+    drupal_set_message(t('Please provide your credentials at the Instagram <a href="@configuration">configuration page</a>.', array('@configuration' => 'admin/config/services/socialfeed/instagram')), 'warning');
+  }
 }
