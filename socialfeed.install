@@ -16,7 +16,6 @@ function socialfeed_requirements($phase) {
   if ($phase == 'runtime') {
     $library['facebook'] = libraries_detect('facebook');
     $library['twitter'] = libraries_detect('twitter');
-    $library['instagram'] = libraries_detect('instagram');
 
     foreach ($library as $key => $value) {
       $error_type = isset($library[$key]['error']) ? drupal_ucfirst($library[$key]['error']) : '';
@@ -42,8 +41,8 @@ function socialfeed_requirements($phase) {
         'title' => $t('PHP SDK for Facebook APIs'),
         'value' => $t('@e: At least @a', array('@e' => $error_type, '@a' => SOCIALFEED_FACEBOOK_SDK_MIN_PLUGIN_VERSION)),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('!error You need to download the !facebook, 
-        place the facebook directory in the %path directory on your server 
+        'description' => $t('!error You need to download the !facebook,
+        place the facebook directory in the %path directory on your server
         and extract the archive
         .', array(
           '!error' => $error_message,
@@ -66,8 +65,8 @@ function socialfeed_requirements($phase) {
         'title' => $t('PHP SDK for Facebook APIs'),
         'value' => $t('At least @a', array('@a' => SOCIALFEED_FACEBOOK_SDK_MIN_PLUGIN_VERSION)),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('You need to download a later version of the 
-        !facebook and replace the old version located in the %path directory 
+        'description' => $t('You need to download a later version of the
+        !facebook and replace the old version located in the %path directory
         on your server.', array(
           '!facebook' => l($t('PHP SDK for Facebook APIs'),
             $library['facebook']['download url']
@@ -82,8 +81,8 @@ function socialfeed_requirements($phase) {
         'title' => $t('PHP SDK for Twitter APIs'),
         'value' => $t('@e: At least @a', array('@e' => $error_type, '@a' => SOCIALFEED_TWITTER_SDK_MIN_PLUGIN_VERSION)),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('!error You need to download the !twitter, 
-        place the twitter directory in the %path directory on your server 
+        'description' => $t('!error You need to download the !twitter,
+        place the twitter directory in the %path directory on your server
         and extract the archive
         .', array(
           '!error' => $error_message,
@@ -106,53 +105,13 @@ function socialfeed_requirements($phase) {
         'title' => $t('PHP SDK for Twitter APIs'),
         'value' => $t('At least @a', array('@a' => SOCIALFEED_TWITTER_SDK_MIN_PLUGIN_VERSION)),
         'severity' => REQUIREMENT_ERROR,
-        'description' => $t('You need to download a later version of the 
-        !twitter and replace the old version located in the %path directory 
+        'description' => $t('You need to download a later version of the
+        !twitter and replace the old version located in the %path directory
         on your server.', array(
           '!twitter' => l($t('PHP SDK for Twitter APIs'),
             $library['twitter']['download url']
           ),
           '%path' => $library['twitter']['library path'],
-        )),
-      );
-    }
-
-    if (empty($library['instagram']['installed'])) {
-      $requirements['instagram'] = array(
-        'title' => $t('PHP SDK for Instagram APIs'),
-        'value' => $t('@e: At least @a', array('@e' => $error_type, '@a' => SOCIALFEED_INSTAGRAM_SDK_MIN_PLUGIN_VERSION)),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => $t('!error You need to download the !instagram, 
-        place the instagram directory in the %path directory on your server 
-        and extract the archive
-        .', array(
-          '!error' => $error_message,
-          '!instagram' => l($t('PHP SDK for Instagram APIs'),
-            $library['instagram']['download url']
-          ),
-          '%path' => 'sites/all/libraries',
-        )),
-      );
-    }
-    elseif (version_compare($library['instagram']['version'], SOCIALFEED_INSTAGRAM_SDK_MIN_PLUGIN_VERSION, '>=')) {
-      $requirements['instagram'] = array(
-        'title' => $t('PHP SDK for Instagram APIs'),
-        'severity' => REQUIREMENT_OK,
-        'value' => 'v' . $library['instagram']['version'] . ' installed',
-      );
-    }
-    else {
-      $requirements['instagram'] = array(
-        'title' => $t('PHP SDK for Instagram APIs'),
-        'value' => $t('At least @a', array('@a' => SOCIALFEED_INSTAGRAM_SDK_MIN_PLUGIN_VERSION)),
-        'severity' => REQUIREMENT_ERROR,
-        'description' => $t('You need to download a later version of the 
-        !instagram and replace the old version located in the %path directory 
-        on your server.', array(
-          '!instagram' => l($t('PHP SDK for Instagram APIs'),
-            $library['instagram']['download url']
-          ),
-          '%path' => $library['instagram']['library path'],
         )),
       );
     }
@@ -178,18 +137,21 @@ function socialfeed_uninstall() {
   variable_del('socialfeed_facebook_trim_length');
   variable_del('socialfeed_facebook_teaser_text');
   variable_del('socialfeed_facebook_hashtag');
-  variable_del('socialfeed_instagram_api_key');
-  variable_del('socialfeed_instagram_api_secret');
   variable_del('socialfeed_instagram_picture_count');
+  variable_del('socialfeed_instagram_client_id');
   variable_del('socialfeed_instagram_picture_resolution');
   variable_del('socialfeed_instagram_redirect_uri');
-  variable_del('socialfeed_instagram_user_id');
+  variable_del('socialfeed_instagram_access_token');
   variable_del('socialfeed_twitter_access_token');
   variable_del('socialfeed_twitter_access_token_secret');
   variable_del('socialfeed_twitter_consumer_key');
   variable_del('socialfeed_twitter_consumer_secret');
   variable_del('socialfeed_twitter_time_format');
+  variable_del('socialfeed_twitter_time_ago');
   variable_del('socialfeed_twitter_time_stamp');
   variable_del('socialfeed_twitter_tweets_count');
   variable_del('socialfeed_twitter_username');
+  variable_del('socialfeed_twitter_hashtag');
+  variable_del('socialfeed_twitter_teaser_text');
+  variable_del('socialfeed_twitter_trim_length');
 }

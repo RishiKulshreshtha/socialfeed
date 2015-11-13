@@ -15,6 +15,7 @@
  * @see system_settings_form()
  */
 function socialfeed_facebook_settings($form, &$form_state) {
+
   $form['socialfeed_facebook_page_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Facebook Page Name'),
@@ -57,11 +58,13 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#title' => 'Select your post type(s) to show',
     '#default_value' => variable_get('socialfeed_facebook_post_type', ''),
     '#options' => array('link', 'status', 'photo', 'video'),
-    // '#multiple' => TRUE,
+    // '#multiple' => TRUE,.
     '#empty_option' => t('- Select -'),
-    '#required' => TRUE,
     '#states' => array(
       'visible' => array(
+        ':input[name="socialfeed_facebook_all_types"]' => array('checked' => FALSE),
+      ),
+      'required' => array(
         ':input[name="socialfeed_facebook_all_types"]' => array('checked' => FALSE),
       ),
     ),
@@ -114,7 +117,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Date/Time format'),
     '#default_value' => variable_get('socialfeed_facebook_time_format', 'd-M-Y'),
-    '#description' => t('You can check for PHP Date Formats <a href="@datetime" target="@blank">here</a>', array('@datetime' => 'http://php.net/manual/en/datetime.formats.date.php#datetime.formats.date', '@blank' => '_blank')),
+    '#description' => t('You can check for PHP Date Formats <a href="@datetime" target="@blank">here</a>', array('@datetime' => 'http://php.net/manual/en/function.date.php', '@blank' => '_blank')),
     '#size' => 60,
     '#maxlength' => 100,
     '#states' => array(
@@ -135,6 +138,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
  * @see system_settings_form()
  */
 function socialfeed_twitter_settings($form, &$form_state) {
+
   $form['socialfeed_twitter_access_token'] = array(
     '#type' => 'textfield',
     '#title' => t('Twitter Access Token'),
@@ -182,6 +186,11 @@ function socialfeed_twitter_settings($form, &$form_state) {
     '#size' => 60,
     '#maxlength' => 100,
   );
+  $form['socialfeed_twitter_hashtag'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show Hashtag'),
+    '#default_value' => variable_get('socialfeed_twitter_hashtag', FALSE),
+  );
   $form['socialfeed_twitter_time_stamp'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show Date/Time'),
@@ -191,7 +200,7 @@ function socialfeed_twitter_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Date/Time format'),
     '#default_value' => variable_get('socialfeed_twitter_time_format', 'd-M-Y'),
-    '#description' => t('You can check for PHP Date Formats <a href="@datetime" target="@blank">here</a>', array('@datetime' => 'http://php.net/manual/en/datetime.formats.date.php#datetime.formats.date', '@blank' => '_blank')),
+    '#description' => t('You can check for PHP Date Formats <a href="@datetime" target="@blank">here</a>', array('@datetime' => 'http://php.net/manual/en/function.date.php', '@blank' => '_blank')),
     '#size' => 60,
     '#maxlength' => 100,
     '#states' => array(
@@ -199,6 +208,25 @@ function socialfeed_twitter_settings($form, &$form_state) {
         ':input[name="socialfeed_twitter_time_stamp"]' => array('checked' => TRUE),
       ),
     ),
+  );
+  $form['socialfeed_twitter_time_ago'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show date Twitter style'),
+    '#default_value' => variable_get('socialfeed_twitter_time_ago', FALSE),
+  );
+  $form['socialfeed_twitter_trim_length'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Trim Length'),
+    '#default_value' => variable_get('socialfeed_twitter_trim_length', 120),
+    '#size' => 60,
+    '#maxlength' => 60,
+  );
+  $form['socialfeed_twitter_teaser_text'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Teaser Text'),
+    '#default_value' => variable_get('socialfeed_twitter_teaser_text', 'Read More'),
+    '#size' => 60,
+    '#maxlength' => 60,
   );
 
   return system_settings_form($form);
@@ -212,27 +240,13 @@ function socialfeed_twitter_settings($form, &$form_state) {
  * @see system_settings_form()
  */
 function socialfeed_instagram_settings($form, &$form_state) {
-  $form['socialfeed_instagram_user_id'] = array(
+
+  $form['socialfeed_instagram_header']['#markup'] = t('To get Client ID you need to manage clients from your instagram account detailed information ' . l('here', 'admin/help/socialfeed', array('attributes' => array('target' => '_blank'))));
+  $form['socialfeed_instagram_client_id'] = array(
     '#type' => 'textfield',
-    '#title' => t('User ID'),
-    '#description' => t('Fetch the Instagram User ID from <a href="@jelled" target="@blank">here</a>.', array('@jelled' => 'http://jelled.com/instagram/lookup-user-id', '@blank' => '_blank')),
-    '#default_value' => variable_get('socialfeed_instagram_user_id'),
-    '#size' => 60,
-    '#maxlength' => 100,
-    '#required' => TRUE,
-  );
-  $form['socialfeed_instagram_api_key'] = array(
-    '#type' => 'textfield',
-    '#title' => t('API Key'),
-    '#default_value' => variable_get('socialfeed_instagram_api_key'),
-    '#size' => 60,
-    '#maxlength' => 100,
-    '#required' => TRUE,
-  );
-  $form['socialfeed_instagram_api_secret'] = array(
-    '#type' => 'textfield',
-    '#title' => t('API Secret'),
-    '#default_value' => variable_get('socialfeed_instagram_api_secret'),
+    '#title' => t('Client ID'),
+    '#description' => t('Client ID from Instagram account'),
+    '#default_value' => variable_get('socialfeed_instagram_client_id'),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -240,7 +254,22 @@ function socialfeed_instagram_settings($form, &$form_state) {
   $form['socialfeed_instagram_redirect_uri'] = array(
     '#type' => 'textfield',
     '#title' => t('Redirect URI'),
+    '#description' => t('Redirect URI from Instagram account'),
     '#default_value' => variable_get('socialfeed_instagram_redirect_uri'),
+    '#size' => 60,
+    '#maxlength' => 100,
+    '#required' => TRUE,
+  );
+  $form['socialfeed_instagram_auth_link'] = array(
+    '#type' => 'item',
+    '#title' => t('Generate Instagram Access Token'),
+    '#description' => t('Access this URL in your browser https://instagram.com/oauth/authorize/?client_id=&lt;your_client_id&gt;&redirect_uri=&lt;your_redirect_uri&gt;&response_type=token, you will get the access token.'),
+    '#markup' => t('Check ' . l('this', 'http://jelled.com/instagram/access-token') . ' article'),
+  );
+  $form['socialfeed_instagram_access_token'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Access Token'),
+    '#default_value' => variable_get('socialfeed_instagram_access_token'),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -252,6 +281,11 @@ function socialfeed_instagram_settings($form, &$form_state) {
     '#size' => 60,
     '#maxlength' => 100,
   );
+  $form['socialfeed_instagram_feed'] = array(
+    '#type' => 'item',
+    '#title' => t('Feed URL'),
+    '#markup' => t('https://api.instagram.com/v1/users/self/feed?access_token=' . variable_get('socialfeed_instagram_access_token') . '&count=' . variable_get('socialfeed_instagram_picture_count', 1)),
+  );
   $form['socialfeed_instagram_picture_resolution'] = array(
     '#type' => 'select',
     '#title' => t('Picture Resolution'),
@@ -261,6 +295,11 @@ function socialfeed_instagram_settings($form, &$form_state) {
       'low_resolution' => t('Low Resolution'),
       'standard_resolution' => t('Standard Resolution'),
     ),
+  );
+  $form['socialfeed_instagram_post_link'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show post URL'),
+    '#default_value' => variable_get('socialfeed_instagram_post_link', FALSE),
   );
 
   return system_settings_form($form);

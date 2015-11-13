@@ -1,6 +1,6 @@
 CONTENTS OF THIS FILE
 ---------------------
-   
+
  * Introduction
  * Dependencies
  * Requirements
@@ -19,9 +19,10 @@ INTRODUCTION
  pictures, videos of your posts also the date of your post with
  provision to provide number of count.
 
- - PHP SDK for Instagram APIs will allow you to display pictures from your
+ - Instagram APIs will allow you to display pictures from your
  instagram profile with provision to provide number of count to be displayed
- also provision to select the resolution of the image with options
+ also provision to select the resolution of the image with options and you can
+ also provide the post link.
 
  - PHP SDK for Twitter APIs will allow you get the latest tweets with date
  of your format and provision to provide number of count. Twitter APIs will
@@ -30,11 +31,8 @@ INTRODUCTION
  - This module is easy and simple to install and use if the project page
  description or the README.txt file is followed correctly.
 
- - This module is highly recommended for the developers and not for the
- non-developers as the default layout of the blocks is plain and in simple text;
- hence if you're aware of working with CSS then this module will work you like a
- charm.
- 
+ - This module is highly recommended for the both developers & non-developers since the default layout of the blocks are plain and in simple text hence if you're aware of working with CSS then this module will work you like a charm.
+
 DEPENDENCIES
 ------------
 
@@ -48,7 +46,6 @@ REQUIREMENTS
  - PHP Curl Extension
  - Facebook PHP SDK 4 - http://git.io/AM4F
  - Twitter API PHP - http://git.io/AM4x
- - jQInstaPics (Instagram) - http://git.io/AM4j
 
 INSTALLATION
 ------------
@@ -73,12 +70,9 @@ steps:
  - For Twitter, download the compressed version of Twitter API PHP and extract
  the files into sites/all/libraries/twitter/
 
- - For Instagram, download the compressed version of jQInstaPics and extract the
- files into sites/all/libraries/instagram/
+ - For Instagram, there is no such dependent library hence you can continue henceforth by enabling the module.
 
- - Now, in your sites/all/modules/ directory download the Social Feed module
- using GIT clone code 
- git clone --branch 7.x-1.x http://git.drupal.org/project/socialfeed.git.
+ - Now, in your sites/all/modules/ directory download the Social Feed module downloaded from https://www.drupal.org/project/socialfeed
 
  - Enable the Social Feed module.
 
@@ -90,7 +84,6 @@ For installing the module:
  some new options:
  - For using Facebook: PHP SDK for Facebook APIs v4.0.16 installed
  - For using Twitter: PHP SDK for Twitter APIs v1.1 installed
- - For using Instagram: PHP SDK for Instagram APIs v1.0 installed
  - Once done, clear all caches.
 
 For removing the module:
