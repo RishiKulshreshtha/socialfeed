@@ -544,6 +544,6 @@ function socialfeed_instagram_posts() {
     }
   }
   else {
-    drupal_set_message(t('Please fill in the required details <a href="@url">here</a>.', array('@url' => 'admin/config/services/socialfeed/instagram'), 'warning');
+    drupal_set_message(t('Please fill in the required details <a href="@url">here</a>.', array('@url' => 'admin/config/services/socialfeed/instagram'), 'warning'));
   }
 }
