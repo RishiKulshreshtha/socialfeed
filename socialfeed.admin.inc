@@ -301,6 +301,18 @@ function socialfeed_instagram_settings($form, &$form_state) {
     '#title' => t('Show post URL'),
     '#default_value' => variable_get('socialfeed_instagram_post_link', FALSE),
   );
+  $form['socialfeed_instagram_trim_text'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Trim Text'),
+    '#default_value' => variable_get('socialfeed_instagram_trim_text', 'Read more'),
+    '#size' => 60,
+    '#maxlength' => 100,
+    '#states' => array(
+      'visible' => array(
+        ':input[name="socialfeed_instagram_post_link"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
 
   return system_settings_form($form);
 }

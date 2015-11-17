@@ -516,6 +516,7 @@ function socialfeed_instagram_posts() {
   $images = $pic = array();
   $instagram_post_link = variable_get('socialfeed_instagram_post_link');
   $resolution = variable_get('socialfeed_instagram_picture_resolution');
+  $instagram_trim_text = variable_get('socialfeed_instagram_trim_text');
   $access_token = variable_get('socialfeed_instagram_access_token');
   $url = "https://api.instagram.com/v1/users/self/media/recent/?access_token=" . variable_get('socialfeed_instagram_access_token') . '&count=' . variable_get('socialfeed_instagram_picture_count');
   $request = drupal_http_request($url);
@@ -526,6 +527,7 @@ function socialfeed_instagram_posts() {
       foreach ($json_response['data'] as $key => $response_data) {
         if ($instagram_post_link == 1) {
           $images[$key]['post_url'] = $response_data['link'];
+          $images[$key]['trim_text'] = $instagram_trim_text;
         }
         $pic[] = $response_data['images'];
         $i++;
