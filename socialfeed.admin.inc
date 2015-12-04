@@ -240,8 +240,28 @@ function socialfeed_twitter_settings($form, &$form_state) {
  * @see system_settings_form()
  */
 function socialfeed_instagram_settings($form, &$form_state) {
-
-  $form['socialfeed_instagram_header']['#markup'] = t('To get Client ID you need to manage clients from your instagram account detailed information ' . l('here', 'admin/help/socialfeed', array('attributes' => array('target' => '_blank'))));
+  global $conf;
+  if (!isset($conf['socialfeed_instagram_client_id'], $conf['socialfeed_instagram_redirect_uri'])) {
+    if (module_exists('help')) {
+      drupal_set_message(t('To get the Client ID & Redirect URI for your Instagram account, please follow the detailed steps mentioned ' . l('here', 'admin/help/socialfeed', array('attributes' => array('target' => '_blank')))) . '.', 'status');
+    }
+    else {
+      drupal_set_message(t('It seems that you\'ve disabled the help module, for more information on Social Feed Settings for Instagram, please enable the help module.'), 'warning', FALSE);
+    }
+  }
+  else {
+    if (!isset($conf['socialfeed_instagram_access_token'])) {
+      drupal_set_message(t('Access this ' . l('URL', 'https://instagram.com/oauth/authorize/?client_id=' . variable_get('socialfeed_instagram_client_id') . ';&redirect_uri=' . variable_get('socialfeed_instagram_redirect_uri') . ';&response_type=token', array('attributes' => array('target' => '_blank')))) . ' in your browser , you will get the Access Token.', 'status');
+    }
+    $form['socialfeed_instagram_access_token'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Access Token'),
+      '#default_value' => variable_get('socialfeed_instagram_access_token'),
+      '#size' => 60,
+      '#maxlength' => 100,
+      '#required' => TRUE,
+    );
+  }
   $form['socialfeed_instagram_client_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Client ID'),
@@ -256,20 +276,6 @@ function socialfeed_instagram_settings($form, &$form_state) {
     '#title' => t('Redirect URI'),
     '#description' => t('Redirect URI from Instagram account'),
     '#default_value' => variable_get('socialfeed_instagram_redirect_uri'),
-    '#size' => 60,
-    '#maxlength' => 100,
-    '#required' => TRUE,
-  );
-  $form['socialfeed_instagram_auth_link'] = array(
-    '#type' => 'item',
-    '#title' => t('Generate Instagram Access Token'),
-    '#description' => t('Access this URL in your browser https://instagram.com/oauth/authorize/?client_id=&lt;your_client_id&gt;&redirect_uri=&lt;your_redirect_uri&gt;&response_type=token, you will get the access token.'),
-    '#markup' => t('Check ' . l('this', 'http://jelled.com/instagram/access-token') . ' article'),
-  );
-  $form['socialfeed_instagram_access_token'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Access Token'),
-    '#default_value' => variable_get('socialfeed_instagram_access_token'),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,

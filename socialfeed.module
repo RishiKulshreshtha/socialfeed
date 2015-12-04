@@ -5,15 +5,6 @@
  */
 
 /**
- * The minimum version of PHP SDKs required.
- */
-define('SOCIALFEED_FACEBOOK_SDK_MIN_PLUGIN_VERSION', '4.0');
-define('SOCIALFEED_TWITTER_SDK_MIN_PLUGIN_VERSION', '1.1');
-
-use Facebook\FacebookSession;
-use Facebook\FacebookRequest;
-
-/**
  * Implements hook_help().
  */
 function socialfeed_help($path, $arg) {
@@ -30,72 +21,6 @@ function socialfeed_help($path, $arg) {
 
       return $output;
   }
-}
-
-/**
- * Implements hook_libraries_info().
- */
-function socialfeed_libraries_info() {
-  $libraries = array();
-  // This array key lets Libraries API search for
-  // 'sites/all/libraries/socialfeed' directory, which should contain the
-  // entire, original extracted library.
-  $libraries['facebook'] = array(
-    // Only used in administrative UI of Libraries API.
-    'name' => 'PHP SDK for Facebook APIs',
-    'vendor url' => 'http://developers.facebook.com/',
-    'download url' => 'https://github.com/facebook/facebook-php-sdk-v4/archive/4.0-dev.zip',
-    // Optional: If, after extraction, the actual library files are contained in
-    // sites/all/libraries/socialfeed/src/Facebook,
-    // specify the relative path here.
-    'path' => 'src/Facebook',
-    // Specify arguments for the version callback. By default,
-    // libraries_get_version() takes a named argument array:
-    'version arguments' => array(
-      'file' => 'src/Facebook/FacebookRequest.php',
-      'pattern' => "/const VERSION = '([\d.]*)/",
-      'lines' => 42,
-    ),
-    'xautoload' => function ($adapter) {
-      $adapter->add('Facebook', 'src');
-    },
-    // Default list of files of the library to load. Important: Only specify
-    // third-party files belonging to the library here, not integration files of
-    // your module.
-    'files' => array(
-      // For PHP libraries, specify include files here, still relative to the
-      // library path.
-      'php' => array(
-        'autoload.php',
-      ),
-    ),
-  );
-
-  $libraries['twitter'] = array(
-    // Only used in administrative UI of Libraries API.
-    'name' => 'PHP SDK for Twitter APIs',
-    'vendor url' => 'https://dev.twitter.com/overview/api/twitter-libraries',
-    'download url' => 'https://github.com/J7mbo/twitter-api-php/archive/master.zip',
-    // Specify arguments for the version callback. By default,
-    // libraries_get_version() takes a named argument array:
-    'version arguments' => array(
-      'file' => 'TwitterAPIExchange.php',
-      'pattern' => "/v[-+]?([0-9]*\.[0-9]+|[0-9]+) API/",
-      'lines' => 4,
-    ),
-    // Default list of files of the library to load. Important: Only specify
-    // third-party files belonging to the library here, not integration files of
-    // your module.
-    'files' => array(
-      // For PHP libraries, specify include files here, still relative to the
-      // library path.
-      'php' => array(
-        'TwitterAPIExchange.php',
-      ),
-    ),
-  );
-
-  return $libraries;
 }
 
 /**
@@ -165,13 +90,13 @@ function socialfeed_theme($existing, $type, $theme, $path) {
 function socialfeed_block_info() {
   $blocks = array();
   $blocks['facebook_latest_feed'] = array(
-    'info' => t('Social Feed Facebook'),
+    'info' => t('Social Feed - Facebook'),
   );
   $blocks['twitter_latest_feed'] = array(
-    'info' => t('Social Feed Twitter'),
+    'info' => t('Social Feed - Twitter'),
   );
   $blocks['instagram_latest_feed'] = array(
-    'info' => t('Social Feed Instagram'),
+    'info' => t('Social Feed - Instagram'),
   );
 
   return $blocks;
@@ -510,6 +435,7 @@ function time_elapsed_string($datetime, $full = FALSE) {
  * Uses socialfeed_instagram_posts() for fetching instagram pictures.
  *
  * @var array $images
+ * @var array $pic
  */
 function socialfeed_instagram_posts() {
   $i = 0;
@@ -522,7 +448,7 @@ function socialfeed_instagram_posts() {
   $request = drupal_http_request($url);
 
   if (isset($access_token) && !empty($access_token)) {
-    if ($request->status_message != 'BAD REQUEST') {
+    if ($request->status_message != 'Bad Request') {
       $json_response = drupal_json_decode($request->data);
       foreach ($json_response['data'] as $key => $response_data) {
         if ($instagram_post_link == 1) {
@@ -541,11 +467,14 @@ function socialfeed_instagram_posts() {
       }
       return theme('socialfeed_instagram', array('instagram_images' => $images));
     }
-    else {
+    elseif ($request->status_message == 'BAD REQUEST') {
       drupal_set_message(t('The access_token provided is invalid.'), 'error');
+    }
+    else {
+      drupal_set_message(t('There is some proxy error with your system or network connection.'), 'error');
     }
   }
   else {
-    drupal_set_message(t('Please fill in the required details <a href="@url">here</a>.', array('@url' => 'admin/config/services/socialfeed/instagram'), 'warning'));
+    drupal_set_message(t('Please fill in the required details <a href="@url">here</a>.', array('@url' => 'admin/config/services/socialfeed/instagram')), 'warning');
   }
 }
