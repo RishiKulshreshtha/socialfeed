@@ -190,7 +190,7 @@ function socialfeed_facebook_feeds($page_name = '') {
         $remaining = variable_get('socialfeed_facebook_no_feeds') - $existing_feeds;
         if ($existing_feeds < variable_get('socialfeed_facebook_no_feeds')) {
           $i = 0;
-          $pager_next = $facebook_values['paging']->next;
+          $pager_next = $json_response['paging']->next;
           $next_page_json = file_get_contents($pager_next);
           $next_page = json_decode($next_page_json);
           foreach ($next_page->data as $next_facebook_value) {
@@ -250,7 +250,7 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
       $message_feed['message'] = substr($facebook_entry['message'], 0, variable_get('socialfeed_facebook_trim_length'));
     }
     if (isset($teaser_text) && !empty($teaser_text)) {
-      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => check_plain($teaser_text))), $facebook_entry['link'], array('attributes' => array('target' => '_blank')));
+      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $facebook_entry['link'], array('attributes' => array('target' => '_blank')));
     }
 
     if ($facebook_hash_tag == 1) {
@@ -282,7 +282,7 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
       $message_feed['message'] = substr($facebook_entry['message'], 0, variable_get('socialfeed_facebook_trim_length'));
     }
     if (isset($teaser_text) && !empty($teaser_text)) {
-      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => check_plain($teaser_text))), $facebook_entry['link'], array('attributes' => array('target' => '_blank')));
+      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $facebook_entry['link'], array('attributes' => array('target' => '_blank')));
     }
   }
 
@@ -313,22 +313,19 @@ function socialfeed_twitter_posts() {
   $twitter_consumer_key = variable_get('socialfeed_twitter_consumer_key');
   $twitter_consumer_secrete = variable_get('socialfeed_twitter_consumer_secret');
 
-  // auth parameters
+  // Auth Parameters.
   $api_key = urlencode($twitter_consumer_key); // Consumer Key (API Key)
   $api_secret = urlencode($twitter_consumer_secrete); // Consumer Secret (API Secret)
   $auth_url = 'https://api.twitter.com/oauth2/token';
 
-  // what we want?
-  $data_username = $twitter_username; // username
-  $data_count = $tweets_count; // number of tweets
+  // What we want?
+  $data_username = $twitter_username; // Username.
+  $data_count = $tweets_count; // Number of Tweets.
   $data_url = 'https://api.twitter.com/1.1/statuses/user_timeline.json';
 
-  // get api access token
-  $api_credentials = base64_encode($api_key.':'.$api_secret);
-
-  $auth_headers = 'Authorization: Basic '.$api_credentials."\r\n".
-                  'Content-Type: application/x-www-form-urlencoded;charset=UTF-8'."\r\n";
-
+  // Get API Access Token.
+  $api_credentials = base64_encode($api_key . ':' . $api_secret);
+  $auth_headers = 'Authorization: Basic ' . $api_credentials . "\r\n" . 'Content-Type: application/x-www-form-urlencoded;charset=UTF-8' . "\r\n";
   $auth_context = stream_context_create(
       array(
           'http' => array(
@@ -342,14 +339,12 @@ function socialfeed_twitter_posts() {
   $auth_response = json_decode(file_get_contents($auth_url, 0, $auth_context), true);
   $auth_token = $auth_response['access_token'];
 
-  // get tweets
+  // Get Tweets.
   $data_context = stream_context_create( array( 'http' => array( 'header' => 'Authorization: Bearer '.$auth_token."\r\n", ) ) );
-
   $twitter_values = json_decode(file_get_contents($data_url.'?count='.$data_count.'&screen_name='.urlencode($data_username), 0, $data_context), true);
 
-  // result - do what you want
+  // Results - Do what you want!
   foreach ($twitter_values as $key => $twitter_value) {
-    // dsm($twitter_value);
     $twitter_tweets[$key]['username'] = $twitter_value['user']['screen_name'];
     $twitter_tweets[$key]['full_username'] = 'http://twitter.com/' . $twitter_value['user']['screen_name'];
     preg_match_all('#\bhttps?://[^\s()<>]+(?:\([\w\d]+\)|([^[:punct:]\s]|/))#', $twitter_value['text'], $extra_links);
@@ -361,13 +356,13 @@ function socialfeed_twitter_posts() {
     }
     if (isset($teaser_text) && !empty($teaser_text)) {
       if (array_key_exists('media', $twitter_value['entities'])) {
-        $twitter_tweets[$key]['tweet_url'] = l(t('@teaser_text', array('@teaser_text' => check_plain($teaser_text))), $twitter_value['entities']['media'][0]['url'], array('attributes' => array('target' => '_blank')));
+        $twitter_tweets[$key]['tweet_url'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $twitter_value['entities']['media'][0]['url'], array('attributes' => array('target' => '_blank')));
       }
     }
     if ($display_time == 1) {
       $formatted_twitter_date = new DateTime($twitter_value['created_at']);
       if ($display_date_twitter_style == 1) {
-        $twitter_tweets[$key]['twitter_date'] = time_elapsed_string($formatted_twitter_date->format(variable_get('socialfeed_twitter_time_format')));
+        $twitter_tweets[$key]['twitter_date'] = socialfeed_time_elapsed_string($formatted_twitter_date->format(variable_get('socialfeed_twitter_time_format')));
       }
       else {
         $twitter_tweets[$key]['twitter_date'] = $formatted_twitter_date->format(variable_get('socialfeed_twitter_time_format'));
@@ -394,7 +389,7 @@ function socialfeed_twitter_posts() {
 /**
  * Displays date in Twitter format.
  */
-function time_elapsed_string($datetime, $full = FALSE) {
+function socialfeed_time_elapsed_string($datetime, $full = FALSE) {
   $now = new DateTime();
   $ago = new DateTime($datetime);
   $diff = $now->diff($ago);

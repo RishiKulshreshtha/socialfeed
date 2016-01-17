@@ -30,7 +30,9 @@ INTRODUCTION
  - This module is easy and simple to install and use if the project page
  description or the README.txt file is followed correctly.
 
- - This module is highly recommended for the both developers & non-developers since the default layout of the blocks are plain and in simple text hence if you're aware of working with CSS then this module will work you like a charm.
+ - This module is highly recommended for the both developers & non-developers
+ since the default layout of the blocks are plain and in simple text hence if
+ you're aware of working with CSS then this module will work you like a charm.
 
 REQUIREMENTS
 ------------
@@ -44,7 +46,8 @@ INSTALLATION
  - Install as usual, see https://www.drupal.org/node/1294804 for further
  information.
 
- - Now, in your sites/all/modules/ directory download the Social Feed module downloaded from https://www.drupal.org/project/socialfeed
+ - Now, in your sites/all/modules/ directory download the Social Feed module
+ downloaded from https://www.drupal.org/project/socialfeed
 
  - Enable the Social Feed module.
 
