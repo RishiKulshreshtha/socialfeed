@@ -6,14 +6,13 @@
  *
  * Variables available:
  * - $facebook_feed: An array of the Facebook feeds.
- * - $facebook_feed['message']: Use this to display Facebook feed.
- * - $facebook_feed['created_stamp']: Use this to display feed date.
- * - $facebook_feed['picture']: Use this to display pictures when post type is Photo
- * - & Show Post Pictures is checked.
- * - $facebook_feed['full_feed_link']: Use this to display direct post link
- * - $facebook_feed['video']: Use this to display videos when post type is Video
- * - & Show Post Video is checked.
- * is selected.
+ * - $facebook_feed['message']: Display Facebook feed.
+ * - $facebook_feed['created_stamp']: Display feed date.
+ * - $facebook_feed['picture']: Display pictures when post type is Photo & Show
+ * Post Pictures is checked.
+ * - $facebook_feed['full_feed_link']: Display direct post link.
+ * - $facebook_feed['video']: Display videos when post type is Video & Show
+ * Post Video is checked.
  */
 ?>
 
