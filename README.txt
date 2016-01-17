@@ -32,12 +32,13 @@ INTRODUCTION
 
  - This module is highly recommended for the both developers & non-developers
  since the default layout of the blocks are plain and in simple text hence if
- you're aware of working with CSS then this module will work you like a charm.
+ you're aware of working with CSS then this module will work for you like a
+ charm.
 
 REQUIREMENTS
 ------------
 
- - PHP 5.4
+ - PHP 5.4 and above.
  - PHP Curl Extension
 
 INSTALLATION
