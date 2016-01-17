@@ -334,10 +334,10 @@ function socialfeed_twitter_posts() {
         'content' => http_build_query(
           array(
             'grant_type' => 'client_credentials',
-          ),
-        ),
-      ),
-    ),
+          )
+        )
+      )
+    )
   );
   $auth_response = json_decode(file_get_contents($auth_url, 0, $auth_context), TRUE);
   $auth_token = $auth_response['access_token'];
@@ -347,8 +347,8 @@ function socialfeed_twitter_posts() {
     array(
       'http' => array(
         'header' => 'Authorization: Bearer ' . $auth_token . "\r\n",
-      ),
-    ),
+      )
+    )
   );
   $twitter_values = json_decode(file_get_contents($data_url . '?count=' . $data_count . '&screen_name=' . urlencode($data_username), 0, $data_context), TRUE);
 

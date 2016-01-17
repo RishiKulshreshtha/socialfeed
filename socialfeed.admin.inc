@@ -225,7 +225,7 @@ function socialfeed_twitter_settings($form, &$form_state) {
  */
 function socialfeed_instagram_settings($form, &$form_state) {
 
-  $form['socialfeed_instagram_header']['#markup'] = t('To get Client ID you need to manage clients from your instagram account detailed information ' . l('here', 'admin/help/socialfeed', array('attributes' => array('target' => '_blank'))));
+  $form['socialfeed_instagram_header']['#markup'] = t('To get Client ID you need to manage clients from your instagram account detailed information <a href="@admin" target="@blank">here</a>.', array('@admin' => url('admin/help/socialfeed'), '@blank' => '_blank'));
   $form['socialfeed_instagram_client_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Client ID'),
