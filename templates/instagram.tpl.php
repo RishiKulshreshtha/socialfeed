@@ -14,7 +14,6 @@
   <li>
     <?php if (isset($instagram_image['post_url']) && !empty($instagram_image['post_url'])) : ?>
     <a href="<?php echo $instagram_image['post_url']?>"><img src="<?php echo $instagram_image['image_url']; ?>"></a>
-    <div><a href="<?php echo $instagram_image['post_url']?>"><?php echo $instagram_image['trim_text']; ?></a></div>
     <?php else: ?>
     <img src="<?php echo $instagram_image['image_url']; ?>">
     <?php endif; ?>
