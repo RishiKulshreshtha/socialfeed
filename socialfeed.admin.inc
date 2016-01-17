@@ -248,7 +248,7 @@ function socialfeed_instagram_settings($form, &$form_state) {
     '#type' => 'item',
     '#title' => t('Generate Instagram Access Token'),
     '#description' => t('Access this URL in your browser https://instagram.com/oauth/authorize/?client_id=&lt;your_client_id&gt;&redirect_uri=&lt;your_redirect_uri&gt;&response_type=token, you will get the access token.'),
-    '#markup' => t('Check ' . l('this', 'http://jelled.com/instagram/access-token') . ' article'),
+    '#markup' => t('Check <a href="@this" target="@blank">this</a> article.', array('@this' => url('http://jelled.com/instagram/access-token'), '@blank' => '_blank')),
   );
   $form['socialfeed_instagram_access_token'] = array(
     '#type' => 'textfield',
@@ -265,11 +265,18 @@ function socialfeed_instagram_settings($form, &$form_state) {
     '#size' => 60,
     '#maxlength' => 100,
   );
-  $form['socialfeed_instagram_feed'] = array(
-    '#type' => 'item',
-    '#title' => t('Feed URL'),
-    '#markup' => t('https://api.instagram.com/v1/users/self/feed?access_token=' . variable_get('socialfeed_instagram_access_token') . '&count=' . variable_get('socialfeed_instagram_picture_count', 1)),
-  );
+  if (variable_get('socialfeed_instagram_access_token')) {
+    $form['socialfeed_instagram_feed'] = array(
+      '#type' => 'item',
+      '#title' => t('Feed URL'),
+      '#markup' => t('https://api.instagram.com/v1/users/self/feed?access_token=@socialfeed_instagram_access_token&count=@socialfeed_instagram_picture_count',
+        array(
+          '@socialfeed_instagram_access_token' => variable_get('socialfeed_instagram_access_token'),
+          '@socialfeed_instagram_picture_count' => variable_get('socialfeed_instagram_picture_count', 1),
+        )
+      ),
+    );
+  }
   $form['socialfeed_instagram_picture_resolution'] = array(
     '#type' => 'select',
     '#title' => t('Picture Resolution'),
