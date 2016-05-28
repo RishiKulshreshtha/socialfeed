@@ -91,12 +91,15 @@ function socialfeed_block_info() {
   $blocks = array();
   $blocks['facebook_latest_feed'] = array(
     'info' => t('Social Feed Facebook'),
+    'cache' => DRUPAL_CACHE_CUSTOM,
   );
   $blocks['twitter_latest_feed'] = array(
     'info' => t('Social Feed Twitter'),
+    'cache' => DRUPAL_CACHE_CUSTOM,
   );
   $blocks['instagram_latest_feed'] = array(
     'info' => t('Social Feed Instagram'),
+    'cache' => DRUPAL_CACHE_CUSTOM,
   );
 
   return $blocks;
@@ -136,7 +139,7 @@ function socialfeed_block_view($delta = '') {
 function socialfeed_facebook_feeds($page_name = '') {
   global $user;
   $selected_type_value = $config = $message_feed = array();
-  $display_time = $display_pic = $display_video = $selected_type = $selected_type_key = $fb_type = $selected_type_value = $url = $request = '';
+  $display_time = $display_pic = $display_video = $display_all_posts = $teaser_text = $facebook_hash_tag = $selected_type = $selected_type_key = $fb_type = $selected_type_value = $url = $request = '';
   $config['app_id'] = variable_get('socialfeed_facebook_app_id');
   $config['secret'] = variable_get('socialfeed_facebook_secret_key');
   $config['page_name'] = variable_get('socialfeed_facebook_page_name');
@@ -146,7 +149,7 @@ function socialfeed_facebook_feeds($page_name = '') {
     $url = "https://graph.facebook.com/" . $config['page_name'] . "/feed?access_token=" . $config['app_id'] . "|" . $config['secret'];
     $request = drupal_http_request($url);
 
-    if ($request->status_message == "OK") {
+    if ($request->status_message && $request->status_message == "OK") {
       $display_time = variable_get('socialfeed_facebook_time_stamp');
       $display_pic = variable_get('socialfeed_facebook_display_pic');
       $display_video = variable_get('socialfeed_facebook_display_video');
@@ -235,6 +238,7 @@ function socialfeed_facebook_feeds($page_name = '') {
  * Rendering values from the Facebook feed.
  */
 function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag) {
+  $trim_length = variable_get('socialfeed_facebook_trim_length');
   if (array_key_exists('message', $facebook_entry)) {
     if ($facebook_entry['type'] == 'photo' || $display_all_posts == 0) {
       if ($display_pic == 1) {
@@ -247,7 +251,24 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
       }
     }
     if (isset($facebook_entry['message'])) {
-      $message_feed['message'] = substr($facebook_entry['message'], 0, variable_get('socialfeed_facebook_trim_length'));
+      if(isset($trim_length) && !empty($trim_length)) {
+        $trimmed_message = substr($facebook_entry['message'], 0, $trim_length);
+        $regex = "(.*)\b.+";
+        if (function_exists('mb_ereg')) {
+          mb_regex_encoding('UTF-8');
+          $found = mb_ereg($regex, $trimmed_message, $matches);
+        }
+        else {
+          $found = preg_match("/$regex/us", $trimmed_message, $matches);
+        }
+        if ($found) {
+          $trimmed_message = $matches[1];
+        }
+        $message_feed['message'] = $trimmed_message;
+      }
+      else {
+        $message_feed['message'] = substr($facebook_entry['message'], 0, 200);
+      }
     }
     if (isset($teaser_text) && !empty($teaser_text)) {
       $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $facebook_entry['link'], array('attributes' => array('target' => '_blank')));
@@ -442,9 +463,10 @@ function socialfeed_instagram_posts() {
   $access_token = variable_get('socialfeed_instagram_access_token');
   $url = "https://api.instagram.com/v1/users/self/media/recent/?access_token=" . variable_get('socialfeed_instagram_access_token') . '&count=' . variable_get('socialfeed_instagram_picture_count');
   $request = drupal_http_request($url);
+  $status = strtoupper($request->status_message);
 
-  if (isset($access_token) && !empty($access_token)) {
-    if ($request->status_message != 'BAD REQUEST') {
+  if ($status == 'OK') {
+    if (isset($access_token) && !empty($access_token)) {
       $json_response = drupal_json_decode($request->data);
       foreach ($json_response['data'] as $key => $response_data) {
         if ($instagram_post_link == 1) {
@@ -467,6 +489,6 @@ function socialfeed_instagram_posts() {
     }
   }
   else {
-    drupal_set_message(t('Please fill in the required details <a href="@url">here</a>.'), array('@url' => 'admin/config/services/socialfeed/instagram'), 'warning');
+    drupal_set_message(t('Please fill in the required details <a href="@url">here</a>. properly', array('@url' => 'admin/config/services/socialfeed/instagram')), 'warning');
   }
 }

@@ -20,7 +20,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook Page Name'),
     '#default_value' => variable_get('socialfeed_facebook_page_name'),
-    '#description' => t('eg. If your Facebook page URL is this http://www.facebook.com/YOUR_PAGE_NAME, <br />then you just need to add this YOUR_PAGE_NAME above.'),
+    '#description' => t('eg. If your Facebook page URL is this http://www.facebook.com/YOUR_PAGE_NAME, <br />then you just need to add this YOUR_PAGE_NAME above OR find your Facebook page Id <a href"@here">Here</a>', array('@here' => 'http://findmyfbid.com/')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -29,6 +29,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook App ID'),
     '#default_value' => variable_get('socialfeed_facebook_app_id'),
+    '#description' => t('Create your Facebook app and visit <a href="@this">this link</a> to get App Id', array('@this' => 'https://developers.facebook.com/apps')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -37,6 +38,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook Secret Key'),
     '#default_value' => variable_get('socialfeed_facebook_secret_key'),
+    '#description' => t('<a href="@this"> This link</a> will help you to find out yuor App Secret Key', array('@this' => 'https://developers.facebook.com/apps')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -45,8 +47,10 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Number of Feeds'),
     '#default_value' => variable_get('socialfeed_facebook_no_feeds', 10),
+    '#description' => t('Number of feeds you want to show from your Facebook page'),
     '#size' => 60,
     '#maxlength' => 60,
+    '#element_validate' => array('element_validate_integer_positive'),
   );
   $form['socialfeed_facebook_all_types'] = array(
     '#type' => 'checkbox',
@@ -95,6 +99,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#default_value' => variable_get('socialfeed_facebook_trim_length', 120),
     '#size' => 60,
     '#maxlength' => 60,
+    '#element_validate' => array('element_validate_integer_positive'),
   );
   $form['socialfeed_facebook_teaser_text'] = array(
     '#type' => 'textfield',
@@ -229,7 +234,7 @@ function socialfeed_instagram_settings($form, &$form_state) {
   $form['socialfeed_instagram_client_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Client ID'),
-    '#description' => t('Client ID from Instagram account'),
+    '#description' => t('Client ID from Instagram account <a href="@here">related article</a>', array('@here' => 'http://darkwhispering.com/how-to/get-a-instagram-client_id-key')),
     '#default_value' => variable_get('socialfeed_instagram_client_id'),
     '#size' => 60,
     '#maxlength' => 100,
