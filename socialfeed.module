@@ -226,7 +226,7 @@ function socialfeed_facebook_feeds($page_name = '') {
   }
   else {
     if (in_array('administrator', array_values($user->roles))) {
-      drupal_set_message(t('Please provide your credentials at the Facebook <a href="@facebook">here</a>.', array('@facebook' => url('admin/config/services/socialfeed'))), 'warning');
+      drupal_set_message(t('Please provide your Facebook credentials <a href="@facebook">here</a>.', array('@facebook' => url('admin/config/services/socialfeed'))), 'warning');
     }
     else {
       drupal_set_message(t('Please login to provide Facebook App values <a href="@facebook">here</a>.', array('@facebook' => url('user'))), 'error');
@@ -489,6 +489,6 @@ function socialfeed_instagram_posts() {
     }
   }
   else {
-    drupal_set_message(t('Please fill in the required details <a href="@url">here</a>. properly', array('@url' => 'admin/config/services/socialfeed/instagram')), 'warning');
+    drupal_set_message(t('Please provide your Instagram credentials <a href="@instagram">here</a>.', array('@instagram' => url('admin/config/services/socialfeed/instagram'))), 'warning');
   }
 }
