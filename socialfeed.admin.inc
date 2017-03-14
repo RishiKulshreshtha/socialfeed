@@ -20,7 +20,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook Page Name'),
     '#default_value' => variable_get('socialfeed_facebook_page_name'),
-    '#description' => t('eg. If your Facebook page URL is this http://www.facebook.com/YOUR_PAGE_NAME, <br />then you just need to add this YOUR_PAGE_NAME above OR find your Facebook page Id <a href"@here">Here</a>', array('@here' => 'http://findmyfbid.com/')),
+    '#description' => t('eg. If your Facebook page URL is this http://www.facebook.com/YOUR_PAGE_NAME, <br />then you just need to add this YOUR_PAGE_NAME above OR find your Facebook Page ID <a href="@here" target="@blank">here</a>.', array('@here' => 'http://findmyfbid.com/', '@blank' => '_blank')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -29,7 +29,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook App ID'),
     '#default_value' => variable_get('socialfeed_facebook_app_id'),
-    '#description' => t('Create your Facebook app and visit <a href="@this">this link</a> to get App Id', array('@this' => 'https://developers.facebook.com/apps')),
+    '#description' => t('Create your Facebook app and visit <a href="@this" target="@blank">this link</a> to get App Id', array('@this' => 'https://developers.facebook.com/apps', '@blank' => '_blank')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -38,7 +38,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook Secret Key'),
     '#default_value' => variable_get('socialfeed_facebook_secret_key'),
-    '#description' => t('<a href="@this"> This link</a> will help you to find out yuor App Secret Key', array('@this' => 'https://developers.facebook.com/apps')),
+    '#description' => t('<a href="@this" target="@blank"> This link</a> will help you to find out yuor App Secret Key', array('@this' => 'https://developers.facebook.com/apps', '@blank' => '_blank')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -61,7 +61,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'select',
     '#title' => 'Select your post type(s) to show',
     '#default_value' => variable_get('socialfeed_facebook_post_type', ''),
-    '#options' => array('link', 'status', 'photo', 'video'),
+    '#options' => array('permalink_url', 'status', 'picture', 'video'),
     // '#multiple' => TRUE,.
     '#empty_option' => t('- Select -'),
     '#states' => array(
@@ -110,7 +110,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
   );
   $form['socialfeed_facebook_hashtag'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show Hashtag'),
+    '#title' => t('Link to Hashtag'),
     '#default_value' => variable_get('socialfeed_facebook_hashtag', FALSE),
   );
   $form['socialfeed_facebook_time_stamp'] = array(
@@ -177,7 +177,7 @@ function socialfeed_twitter_settings($form, &$form_state) {
   );
   $form['socialfeed_twitter_hashtag'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show Hashtag'),
+    '#title' => t('Link to Hashtag'),
     '#default_value' => variable_get('socialfeed_twitter_hashtag', FALSE),
   );
   $form['socialfeed_twitter_time_stamp'] = array(
@@ -200,7 +200,7 @@ function socialfeed_twitter_settings($form, &$form_state) {
   );
   $form['socialfeed_twitter_time_ago'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show date Twitter style'),
+    '#title' => t('Show Twitter Style Date'),
     '#default_value' => variable_get('socialfeed_twitter_time_ago', FALSE),
   );
   $form['socialfeed_twitter_trim_length'] = array(
@@ -213,7 +213,7 @@ function socialfeed_twitter_settings($form, &$form_state) {
   $form['socialfeed_twitter_teaser_text'] = array(
     '#type' => 'textfield',
     '#title' => t('Teaser Text'),
-    '#default_value' => variable_get('socialfeed_twitter_teaser_text', 'Read More'),
+    '#default_value' => variable_get('socialfeed_twitter_teaser_text', 'View Media on Twitter'),
     '#size' => 60,
     '#maxlength' => 60,
   );
@@ -300,3 +300,4 @@ function socialfeed_instagram_settings($form, &$form_state) {
 
   return system_settings_form($form);
 }
+

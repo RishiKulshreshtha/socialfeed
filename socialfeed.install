@@ -39,3 +39,4 @@ function socialfeed_uninstall() {
   variable_del('socialfeed_twitter_tweets_count');
   variable_del('socialfeed_twitter_username');
 }
+

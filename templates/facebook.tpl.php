@@ -16,32 +16,33 @@
  */
 ?>
 
-<?php if (variable_get('socialfeed_facebook_app_id') != '') : ?>
+
+<?php if (variable_get('socialfeed_facebook_app_id') != ''): ?>
   <ul>
     <?php foreach ($facebook as $facebook_feed): ?>
     <li>
       <!-- Feed -->
-        <?php if (isset($facebook_feed['message']) && !empty($facebook_feed['message'])) : ?>
+        <?php if (isset($facebook_feed['message']) && !empty($facebook_feed['message'])): ?>
         <div class="fb-message">
             <?php print $facebook_feed['message']; ?>
         </div>
       <!-- Full post link -->
-        <?php endif; if (isset($facebook_feed['full_feed_link']) && !empty($facebook_feed['full_feed_link'])) : ?>
+        <?php endif; if (isset($facebook_feed['full_feed_link']) && !empty($facebook_feed['full_feed_link'])): ?>
         <div class="teaser-link">
             <?php print $facebook_feed['full_feed_link']; ?>
         </div>
       <!-- Time -->
-        <?php endif; if (isset($facebook_feed['created_stamp']) && !empty($facebook_feed['created_stamp'])) : ?>
+        <?php endif; if (isset($facebook_feed['created_stamp']) && !empty($facebook_feed['created_stamp'])): ?>
         <div class="fb-time">
             <?php print $facebook_feed['created_stamp']; ?>
         </div>
       <!-- Picture -->
-        <?php endif; if (isset($facebook_feed['picture']) && !empty($facebook_feed['picture'])) : ?>
+        <?php endif; if (isset($facebook_feed['picture']) && !empty($facebook_feed['picture'])): ?>
         <div class="fb-pic">
           <img src="<?php print $facebook_feed['picture']; ?>">
         </div>
       <!-- Video -->
-        <?php endif; if (isset($facebook_feed['video']) && !empty($facebook_feed['video'])) : ?>
+        <?php endif; if (isset($facebook_feed['video']) && !empty($facebook_feed['video'])): ?>
         <div class="fb-video">
           <a href="<?php print $facebook_feed['video']; ?>">See Video</a>
         </div>
@@ -50,3 +51,4 @@
     <?php endforeach; ?>
   </ul>
 <?php endif;
+

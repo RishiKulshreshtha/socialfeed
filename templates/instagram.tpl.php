@@ -10,10 +10,10 @@
  */
 ?>
 <ul>
-<?php foreach ($instagram_images as $instagram_image) : ?>
+<?php foreach ($instagram_images as $instagram_image): ?>
   <li>
-    <?php if (isset($instagram_image['post_url']) && !empty($instagram_image['post_url'])) : ?>
-    <a href="<?php echo $instagram_image['post_url']?>"><img src="<?php echo $instagram_image['image_url']; ?>"></a>
+    <?php if (isset($instagram_image['post_url']) && !empty($instagram_image['post_url'])): ?>
+    <a href="<?php echo $instagram_image['post_url'] ?>"><img src="<?php echo $instagram_image['image_url']; ?>"></a>
     <?php else: ?>
     <img src="<?php echo $instagram_image['image_url']; ?>">
     <?php endif; ?>
