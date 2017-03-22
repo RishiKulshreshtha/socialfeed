@@ -167,7 +167,6 @@ function socialfeed_facebook_feeds($page_name = '') {
       $post_type_filter = $next_post_type_filter = array();
       $json_response = drupal_json_decode($request->data);
 
-
       if (isset($json_response['data']) && !empty($json_response['data'])) {
         foreach ($json_response['data'] as $facebook_value) {
           // If specific post type is selected.
@@ -258,6 +257,7 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
     }
     if (isset($facebook_entry['message'])) {
       if (isset($trim_length) && !empty($trim_length)) {
+        $matches = "";
         $trimmed_message = substr($facebook_entry['message'], 0, $trim_length);
         $regex = "(.*)\b.+";
         if (function_exists('mb_ereg')) {
@@ -288,8 +288,7 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
         '/#(\\w+)/',
       function ($hash) {
           return l($hash[0], 'https:facebook.com/hashtag/' . $hash[1], array('attributes' => array('target' => '_blank')));
-      }
-      , $message_feed['message']
+      }, $message_feed['message']
       );
     }
     if ($display_time == 1) {
@@ -418,14 +417,13 @@ function socialfeed_twitter_posts() {
         $twitter_tweets[$key]['tweet'] = preg_replace_callback(
           '/#(\\w+)|@(\\w+)/',
         function ($hash) {
-            if ($hash[0][0] == '#') {
-              return l($hash[0], '//twitter.com/hashtag/' . $hash[1], array('attributes' => array('target' => '_blank')));
+          if ($hash[0][0] == '#') {
+            return l($hash[0], '//twitter.com/hashtag/' . $hash[1], array('attributes' => array('target' => '_blank')));
           }
-            if ($hash[0][0] == '@') {
-              return l($hash[0], '//twitter.com/' . $hash[2], array('attributes' => array('target' => '_blank')));
+          if ($hash[0][0] == '@') {
+            return l($hash[0], '//twitter.com/' . $hash[2], array('attributes' => array('target' => '_blank')));
           }
-        }
-        , $twitter_tweets[$key]['tweet']
+        }, $twitter_tweets[$key]['tweet']
         );
       }
     }

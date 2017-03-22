@@ -300,4 +300,3 @@ function socialfeed_instagram_settings($form, &$form_state) {
 
   return system_settings_form($form);
 }
-
