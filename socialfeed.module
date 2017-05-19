@@ -339,6 +339,7 @@ function socialfeed_facebook_posts() {
  * @var array $settings
  */
 function socialfeed_twitter_posts() {
+  $twitter_tweets = array();
   $tweets_count = variable_get('socialfeed_twitter_tweets_count');
   $twitter_username = variable_get('socialfeed_twitter_username');
   $display_time = variable_get('socialfeed_twitter_time_stamp');
