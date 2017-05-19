@@ -397,7 +397,12 @@ function socialfeed_twitter_posts() {
         $twitter_tweets[$key]['extra_links'][] = $extra_link;
       }
       if (isset($twitter_value['text'])) {
-        $twitter_tweets[$key]['tweet'] = substr(rtrim($twitter_value['text'], $extra_link), 0, variable_get('socialfeed_twitter_trim_length'));
+        if (!empty($extra_link)) {
+          $twitter_tweets[$key]['tweet'] = substr(rtrim($twitter_value['text'], $extra_link), 0, variable_get('socialfeed_twitter_trim_length'));
+        }
+        else {
+          $twitter_tweets[$key]['tweet'] = substr(rtrim($twitter_value['text']), 0, variable_get('socialfeed_twitter_trim_length'));
+        }
       }
       if (isset($teaser_text) && !empty($teaser_text)) {
         if (array_key_exists('media', $twitter_value['entities'])) {
