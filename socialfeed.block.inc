@@ -117,16 +117,14 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
   // dsm($facebook_entry);
   $trim_length = variable_get('socialfeed_facebook_trim_length');
   if (array_key_exists('message', $facebook_entry)) {
-    if (isset($facebook_entry['type']) && !empty($facebook_entry['type'])) {
-      if ($facebook_entry['type'] == 'full_picture' || $display_all_posts == 0) {
-        if ($display_pic == 1) {
-          $message_feed['full_picture'] = $facebook_entry['full_picture'];
-        }
+    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
+      if ($display_pic == 1) {
+        $message_feed['full_picture'] = $facebook_entry['full_picture'];
       }
-      if ($facebook_entry['type'] == 'video' || $display_all_posts == 0) {
-        if ($display_video == 1) {
-          $message_feed['video'] = $facebook_entry['source'];
-        }
+    }
+    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
+      if ($display_video == 1) {
+        $message_feed['video'] = $facebook_entry['source'];
       }
     }
     if (isset($facebook_entry['message'])) {
@@ -168,16 +166,14 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
     }
   }
   else {
-    if (isset($facebook_entry['type']) && !empty($facebook_entry['type'])) {
-      if ($facebook_entry['type'] == 'full_picture' || $display_all_posts == 0) {
-        if ($display_pic == 1) {
-          $message_feed['full_picture'] = $facebook_entry['full_picture'];
-        }
+    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
+      if ($display_pic == 1) {
+        $message_feed['full_picture'] = $facebook_entry['full_picture'];
       }
-      if ($facebook_entry['type'] == 'video' || $display_all_posts == 0) {
-        if ($display_video == 1) {
-          $message_feed['video'] = $facebook_entry['source'];
-        }
+    }
+    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
+      if ($display_video == 1) {
+        $message_feed['video'] = $facebook_entry['source'];
       }
     }
 
