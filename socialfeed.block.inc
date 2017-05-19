@@ -20,7 +20,7 @@ function socialfeed_facebook_feeds($page_name = '') {
   $config['page_name'] = variable_get('socialfeed_facebook_page_name');
 
   if (isset($config['app_id']) && !empty($config['app_id']) && isset($config['secret']) && !empty($config['secret'])) {
-    $url = "https://graph.facebook.com/" . $config['page_name'] . "/feed?access_token=" . $config['app_id'] . "|" . $config['secret'] . '&fields=id,created_time,message,permalink_url,full_picture';
+    $url = "https://graph.facebook.com/" . $config['page_name'] . "/feed?access_token=" . $config['app_id'] . "|" . $config['secret'] . '&fields=created_time,full_picture,id,message,permalink_url';
     $request = drupal_http_request($url);
 
     if ($request->status_message && $request->status_message == "OK") {
@@ -32,7 +32,7 @@ function socialfeed_facebook_feeds($page_name = '') {
       $facebook_hash_tag = variable_get('socialfeed_facebook_hashtag');
       $selected_type = variable_get('socialfeed_facebook_post_type');
       $selected_type_key = $selected_type;
-      $fb_type = array('permalink_url', 'status', 'picture', 'video');
+      $fb_type = array('permalink_url', 'status', 'full_picture', 'video');
       if (isset($selected_type_key) && !empty($selected_type_key)) {
         $selected_type_value = $fb_type[$selected_type_key];
       }
@@ -114,12 +114,13 @@ function socialfeed_facebook_feeds($page_name = '') {
  * Rendering values from the Facebook feed.
  */
 function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag) {
+  // dsm($facebook_entry);
   $trim_length = variable_get('socialfeed_facebook_trim_length');
   if (array_key_exists('message', $facebook_entry)) {
     if (isset($facebook_entry['type']) && !empty($facebook_entry['type'])) {
-      if ($facebook_entry['type'] == 'picture' || $display_all_posts == 0) {
+      if ($facebook_entry['type'] == 'full_picture' || $display_all_posts == 0) {
         if ($display_pic == 1) {
-          $message_feed['picture'] = $facebook_entry['picture'];
+          $message_feed['full_picture'] = $facebook_entry['full_picture'];
         }
       }
       if ($facebook_entry['type'] == 'video' || $display_all_posts == 0) {
@@ -168,9 +169,9 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
   }
   else {
     if (isset($facebook_entry['type']) && !empty($facebook_entry['type'])) {
-      if ($facebook_entry['type'] == 'picture' || $display_all_posts == 0) {
+      if ($facebook_entry['type'] == 'full_picture' || $display_all_posts == 0) {
         if ($display_pic == 1) {
-          $message_feed['picture'] = $facebook_entry['picture'];
+          $message_feed['full_picture'] = $facebook_entry['full_picture'];
         }
       }
       if ($facebook_entry['type'] == 'video' || $display_all_posts == 0) {

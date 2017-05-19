@@ -61,7 +61,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'select',
     '#title' => 'Select your post type(s) to show',
     '#default_value' => variable_get('socialfeed_facebook_post_type', ''),
-    '#options' => array('permalink_url', 'status', 'picture', 'video'),
+    '#options' => array('permalink_url', 'status', 'full_picture', 'video'),
     // '#multiple' => TRUE,.
     '#empty_option' => t('- Select -'),
     '#states' => array(

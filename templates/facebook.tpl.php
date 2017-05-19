@@ -37,9 +37,9 @@
             <?php print $facebook_feed['created_stamp']; ?>
         </div>
       <!-- Picture -->
-        <?php endif; if (isset($facebook_feed['picture']) && !empty($facebook_feed['picture'])): ?>
+        <?php endif; if (isset($facebook_feed['full_picture']) && !empty($facebook_feed['full_picture'])): ?>
         <div class="fb-pic">
-          <img src="<?php print $facebook_feed['picture']; ?>">
+          <img src="<?php print $facebook_feed['full_picture']; ?>">
         </div>
       <!-- Video -->
         <?php endif; if (isset($facebook_feed['video']) && !empty($facebook_feed['video'])): ?>
