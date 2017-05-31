@@ -6,6 +6,86 @@
  */
 
 /**
+ * Rendering values from the Facebook feed.
+ */
+function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag) {
+  $trim_length = variable_get('socialfeed_facebook_trim_length');
+  if (array_key_exists('message', $facebook_entry)) {
+    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
+      if ($display_pic == 1) {
+        $message_feed['full_picture'] = $facebook_entry['full_picture'];
+      }
+    }
+    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
+      if ($display_video == 1) {
+        $message_feed['video'] = $facebook_entry['source'];
+      }
+    }
+    if (isset($facebook_entry['message'])) {
+      if (isset($trim_length) && !empty($trim_length)) {
+        $matches = "";
+        $trimmed_message = substr($facebook_entry['message'], 0, $trim_length);
+        $regex = "(.*)\b.+";
+        if (function_exists('mb_ereg')) {
+          mb_regex_encoding('UTF-8');
+          $found = mb_ereg($regex, $trimmed_message, $matches);
+        }
+        else {
+          $found = preg_match("/$regex/us", $trimmed_message, $matches);
+        }
+        if ($found) {
+          $trimmed_message = $matches[1];
+        }
+        $message_feed['message'] = $trimmed_message;
+      }
+      else {
+        $message_feed['message'] = substr($facebook_entry['message'], 0, 200);
+      }
+    }
+    if (isset($teaser_text) && !empty($teaser_text) && isset($facebook_entry['permalink_url'])) {
+      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $facebook_entry['permalink_url'], array('attributes' => array('target' => '_blank')));
+    }
+    else {
+      $message_feed['full_feed_link'] = t('@teaser_text', array('@teaser_text' => $teaser_text));
+    }
+
+    if ($facebook_hash_tag == 1) {
+      $message_feed['message'] = preg_replace_callback('/#(\\w+)/', function ($hash) {
+        return l($hash[0], 'https:facebook.com/hashtag/' . $hash[1], array('attributes' => array('target' => '_blank')));
+      }, $message_feed['message']);
+    }
+    if ($display_time == 1) {
+      $formatted_date = new DateTime($facebook_entry['created_time']);
+      $message_feed['created_stamp'] = $formatted_date->format(variable_get('socialfeed_facebook_time_format'));
+    }
+  }
+  else {
+    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
+      if ($display_pic == 1) {
+        $message_feed['full_picture'] = $facebook_entry['full_picture'];
+      }
+    }
+    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
+      if ($display_video == 1) {
+        $message_feed['video'] = $facebook_entry['source'];
+      }
+    }
+
+    if (isset($facebook_entry['message']) && !empty($facebook_entry['message'])) {
+      $message_feed['message'] = substr($facebook_entry['message'], 0, variable_get('socialfeed_facebook_trim_length'));
+    }
+    if (isset($teaser_text) && !empty($teaser_text) && isset($facebook_entry['permalink_url'])) {
+      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $facebook_entry['permalink_url'], array('attributes' => array('target' => '_blank')));
+    }
+    else {
+      $message_feed['full_feed_link'] = t('@teaser_text', array('@teaser_text' => $teaser_text));
+    }
+  }
+
+  return $message_feed;
+}
+
+/**
  * Returns HTML with feeds in required format.
  *
  * @param string $page_name
@@ -108,87 +188,6 @@ function socialfeed_facebook_feeds($page_name = '') {
       drupal_set_message(t('Please login to provide Facebook App values <a href="@facebook">here</a>.', array('@facebook' => url('user'))), 'error');
     }
   }
-}
-
-/**
- * Rendering values from the Facebook feed.
- */
-function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag) {
-  // dsm($facebook_entry);
-  $trim_length = variable_get('socialfeed_facebook_trim_length');
-  if (array_key_exists('message', $facebook_entry)) {
-    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
-      if ($display_pic == 1) {
-        $message_feed['full_picture'] = $facebook_entry['full_picture'];
-      }
-    }
-    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
-      if ($display_video == 1) {
-        $message_feed['video'] = $facebook_entry['source'];
-      }
-    }
-    if (isset($facebook_entry['message'])) {
-      if (isset($trim_length) && !empty($trim_length)) {
-        $matches = "";
-        $trimmed_message = substr($facebook_entry['message'], 0, $trim_length);
-        $regex = "(.*)\b.+";
-        if (function_exists('mb_ereg')) {
-          mb_regex_encoding('UTF-8');
-          $found = mb_ereg($regex, $trimmed_message, $matches);
-        }
-        else {
-          $found = preg_match("/$regex/us", $trimmed_message, $matches);
-        }
-        if ($found) {
-          $trimmed_message = $matches[1];
-        }
-        $message_feed['message'] = $trimmed_message;
-      }
-      else {
-        $message_feed['message'] = substr($facebook_entry['message'], 0, 200);
-      }
-    }
-    if (isset($teaser_text) && !empty($teaser_text) && isset($facebook_entry['permalink_url'])) {
-      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $facebook_entry['permalink_url'], array('attributes' => array('target' => '_blank')));
-    }
-    else {
-      $message_feed['full_feed_link'] = t('@teaser_text', array('@teaser_text' => $teaser_text));
-    }
-
-    if ($facebook_hash_tag == 1) {
-      $message_feed['message'] = preg_replace_callback('/#(\\w+)/', function ($hash) {
-        return l($hash[0], 'https:facebook.com/hashtag/' . $hash[1], array('attributes' => array('target' => '_blank')));
-      }, $message_feed['message']);
-    }
-    if ($display_time == 1) {
-      $formatted_date = new DateTime($facebook_entry['created_time']);
-      $message_feed['created_stamp'] = $formatted_date->format(variable_get('socialfeed_facebook_time_format'));
-    }
-  }
-  else {
-    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
-      if ($display_pic == 1) {
-        $message_feed['full_picture'] = $facebook_entry['full_picture'];
-      }
-    }
-    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
-      if ($display_video == 1) {
-        $message_feed['video'] = $facebook_entry['source'];
-      }
-    }
-
-    if (isset($facebook_entry['message']) && !empty($facebook_entry['message'])) {
-      $message_feed['message'] = substr($facebook_entry['message'], 0, variable_get('socialfeed_facebook_trim_length'));
-    }
-    if (isset($teaser_text) && !empty($teaser_text) && isset($facebook_entry['permalink_url'])) {
-      $message_feed['full_feed_link'] = l(t('@teaser_text', array('@teaser_text' => $teaser_text)), $facebook_entry['permalink_url'], array('attributes' => array('target' => '_blank')));
-    }
-    else {
-      $message_feed['full_feed_link'] = t('@teaser_text', array('@teaser_text' => $teaser_text));
-    }
-  }
-
-  return $message_feed;
 }
 
 /**

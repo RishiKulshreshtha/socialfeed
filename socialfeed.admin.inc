@@ -60,7 +60,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
   $form['socialfeed_facebook_post_type'] = array(
     '#type' => 'select',
     '#title' => 'Select your post type(s) to show',
-    '#default_value' => variable_get('socialfeed_facebook_post_type', ''),
+    '#default_value' => variable_get('socialfeed_facebook_post_type'),
     '#options' => array('permalink_url', 'status', 'full_picture', 'video'),
     // '#multiple' => TRUE,.
     '#empty_option' => t('- Select -'),
@@ -76,7 +76,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
   $form['socialfeed_facebook_display_pic'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show Post Picture'),
-    '#default_value' => variable_get('socialfeed_facebook_display_pic', FALSE),
+    '#default_value' => variable_get('socialfeed_facebook_display_pic', TRUE),
     '#states' => array(
       'visible' => array(
         ':input[name="socialfeed_facebook_post_type"]' => array('value' => 2),
@@ -86,7 +86,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
   $form['socialfeed_facebook_display_video'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show Post Video'),
-    '#default_value' => variable_get('socialfeed_facebook_display_video', FALSE),
+    '#default_value' => variable_get('socialfeed_facebook_display_video', TRUE),
     '#states' => array(
       'visible' => array(
         ':input[name="socialfeed_facebook_post_type"]' => array('value' => 3),
@@ -111,7 +111,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
   $form['socialfeed_facebook_hashtag'] = array(
     '#type' => 'checkbox',
     '#title' => t('Link to Hashtag'),
-    '#default_value' => variable_get('socialfeed_facebook_hashtag', FALSE),
+    '#default_value' => variable_get('socialfeed_facebook_hashtag', TRUE),
   );
   $form['socialfeed_facebook_time_stamp'] = array(
     '#type' => 'checkbox',
