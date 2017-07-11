@@ -11,31 +11,19 @@
 function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $display_time, $display_pic, $display_video, $teaser_text, $facebook_hash_tag) {
   $trim_length = variable_get('socialfeed_facebook_trim_length');
   if (array_key_exists('message', $facebook_entry)) {
-    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
+    if (isset($facebook_entry['full_picture']) && $display_all_posts == 0) {
       if ($display_pic == 1) {
         $message_feed['full_picture'] = $facebook_entry['full_picture'];
       }
     }
-    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
+    if (isset($facebook_entry['source']) && $display_all_posts == 0) {
       if ($display_video == 1) {
         $message_feed['video'] = $facebook_entry['source'];
       }
     }
     if (isset($facebook_entry['message'])) {
       if (isset($trim_length) && !empty($trim_length)) {
-        $matches = "";
         $trimmed_message = substr($facebook_entry['message'], 0, $trim_length);
-        $regex = "(.*)\b.+";
-        if (function_exists('mb_ereg')) {
-          mb_regex_encoding('UTF-8');
-          $found = mb_ereg($regex, $trimmed_message, $matches);
-        }
-        else {
-          $found = preg_match("/$regex/us", $trimmed_message, $matches);
-        }
-        if ($found) {
-          $trimmed_message = $matches[1];
-        }
         $message_feed['message'] = $trimmed_message;
       }
       else {
@@ -60,12 +48,12 @@ function socialfeed_facebook_data($i, $facebook_entry, $display_all_posts, $disp
     }
   }
   else {
-    if (isset($facebook_entry['full_picture']) || $display_all_posts == 0) {
+    if (isset($facebook_entry['full_picture']) && $display_all_posts == 0) {
       if ($display_pic == 1) {
         $message_feed['full_picture'] = $facebook_entry['full_picture'];
       }
     }
-    if (isset($facebook_entry['video']) || $display_all_posts == 0) {
+    if (isset($facebook_entry['source']) && $display_all_posts == 0) {
       if ($display_video == 1) {
         $message_feed['video'] = $facebook_entry['source'];
       }
