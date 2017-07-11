@@ -88,7 +88,7 @@ function socialfeed_facebook_feeds($page_name = '') {
   $config['page_name'] = variable_get('socialfeed_facebook_page_name');
 
   if (isset($config['app_id']) && !empty($config['app_id']) && isset($config['secret']) && !empty($config['secret'])) {
-    $url = "https://graph.facebook.com/" . $config['page_name'] . "/feed?access_token=" . $config['app_id'] . "|" . $config['secret'] . '&fields=created_time,full_picture,id,message,permalink_url';
+    $url = "https://graph.facebook.com/" . $config['page_name'] . "/feed?access_token=" . $config['app_id'] . "|" . $config['secret'] . '&fields=id,type,created_time,message,full_picture,permalink_url,source';
     $request = drupal_http_request($url);
 
     if ($request->status_message && $request->status_message == "OK") {
@@ -99,9 +99,10 @@ function socialfeed_facebook_feeds($page_name = '') {
       $teaser_text = variable_get('socialfeed_facebook_teaser_text');
       $facebook_hash_tag = variable_get('socialfeed_facebook_hashtag');
       $selected_type = variable_get('socialfeed_facebook_post_type');
+      // @TODO: Check why this is used?
       $selected_type_key = $selected_type;
-      $fb_type = array('permalink_url', 'status', 'full_picture', 'video');
-      if (isset($selected_type_key) && !empty($selected_type_key)) {
+      $fb_type = array('link', 'photo', 'status', 'video');
+      if (isset($selected_type_key)) {
         $selected_type_value = $fb_type[$selected_type_key];
       }
       $i = 0;
@@ -137,7 +138,7 @@ function socialfeed_facebook_feeds($page_name = '') {
         $remaining = variable_get('socialfeed_facebook_no_feeds') - $existing_feeds;
         if ($existing_feeds < variable_get('socialfeed_facebook_no_feeds')) {
           $i = 0;
-          $pager_next = $json_response['paging']->next;
+          $pager_next = $json_response['paging']['next'];
           $next_page_json = file_get_contents($pager_next);
           $next_page = json_decode($next_page_json);
           foreach ($next_page->data as $next_facebook_value) {
@@ -336,7 +337,7 @@ function socialfeed_instagram_posts() {
       $json_response = drupal_json_decode($request->data);
       foreach ($json_response['data'] as $key => $response_data) {
         if ($instagram_post_link == 1) {
-          $images[$key]['post_url'] = $response_data['permalink_url'];
+          $images[$key]['post_url'] = $response_data['link'];
         }
         $pic[] = $response_data['images'];
         $i++;

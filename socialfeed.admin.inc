@@ -15,7 +15,6 @@
  * @see system_settings_form()
  */
 function socialfeed_facebook_settings($form, &$form_state) {
-
   $form['socialfeed_facebook_page_name'] = array(
     '#type' => 'textfield',
     '#title' => t('Facebook Page Name'),
@@ -29,7 +28,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook App ID'),
     '#default_value' => variable_get('socialfeed_facebook_app_id'),
-    '#description' => t('Create your Facebook app and visit <a href="@this" target="@blank">this link</a> to get App Id', array('@this' => 'https://developers.facebook.com/apps', '@blank' => '_blank')),
+    '#description' => t('Create your Facebook app and visit <a href="@this" target="@blank">this link</a> to get App ID.', array('@this' => 'https://developers.facebook.com/apps', '@blank' => '_blank')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -38,7 +37,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Facebook Secret Key'),
     '#default_value' => variable_get('socialfeed_facebook_secret_key'),
-    '#description' => t('<a href="@this" target="@blank"> This link</a> will help you to find out yuor App Secret Key', array('@this' => 'https://developers.facebook.com/apps', '@blank' => '_blank')),
+    '#description' => t('<a href="@this" target="@blank"> This link</a> will help you to find out your App Secret Key.', array('@this' => 'https://developers.facebook.com/apps', '@blank' => '_blank')),
     '#size' => 60,
     '#maxlength' => 100,
     '#required' => TRUE,
@@ -47,7 +46,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'textfield',
     '#title' => t('Number of Feeds'),
     '#default_value' => variable_get('socialfeed_facebook_no_feeds', 10),
-    '#description' => t('Number of feeds you want to show from your Facebook page'),
+    '#description' => t('Number of feeds you want to show from your Facebook Page.'),
     '#size' => 60,
     '#maxlength' => 60,
     '#element_validate' => array('element_validate_integer_positive'),
@@ -61,9 +60,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#type' => 'select',
     '#title' => 'Select your post type(s) to show',
     '#default_value' => variable_get('socialfeed_facebook_post_type'),
-    '#options' => array('permalink_url', 'status', 'full_picture', 'video'),
-    // '#multiple' => TRUE,.
-    '#empty_option' => t('- Select -'),
+    '#options' => array('link', 'photo', 'status', 'video'),
     '#states' => array(
       'visible' => array(
         ':input[name="socialfeed_facebook_all_types"]' => array('checked' => FALSE),
@@ -79,7 +76,7 @@ function socialfeed_facebook_settings($form, &$form_state) {
     '#default_value' => variable_get('socialfeed_facebook_display_pic', TRUE),
     '#states' => array(
       'visible' => array(
-        ':input[name="socialfeed_facebook_post_type"]' => array('value' => 2),
+        ':input[name="socialfeed_facebook_post_type"]' => array('value' => 1),
       ),
     ),
   );
@@ -143,7 +140,6 @@ function socialfeed_facebook_settings($form, &$form_state) {
  * @see system_settings_form()
  */
 function socialfeed_twitter_settings($form, &$form_state) {
-
   $form['socialfeed_twitter_consumer_key'] = array(
     '#type' => 'textfield',
     '#title' => t('Twitter Consumer Key'),
@@ -229,12 +225,11 @@ function socialfeed_twitter_settings($form, &$form_state) {
  * @see system_settings_form()
  */
 function socialfeed_instagram_settings($form, &$form_state) {
-
   $form['socialfeed_instagram_header']['#markup'] = t('To get Client ID you need to manage clients from your instagram account detailed information <a href="@admin" target="@blank">here</a>.', array('@admin' => url('admin/help/socialfeed'), '@blank' => '_blank'));
   $form['socialfeed_instagram_client_id'] = array(
     '#type' => 'textfield',
     '#title' => t('Client ID'),
-    '#description' => t('Client ID from Instagram account <a href="@here">related article</a>', array('@here' => 'http://darkwhispering.com/how-to/get-a-instagram-client_id-key')),
+    '#description' => t('Client ID from your Instagram Account, for more details click <a href="@here"  target="@blank">here</a>.', array('@here' => 'https://gist.github.com/hemangigokhale/156db13c70840f076d766cd2b3976276#instagram', '@blank' => '_blank')),
     '#default_value' => variable_get('socialfeed_instagram_client_id'),
     '#size' => 60,
     '#maxlength' => 100,
@@ -243,7 +238,7 @@ function socialfeed_instagram_settings($form, &$form_state) {
   $form['socialfeed_instagram_redirect_uri'] = array(
     '#type' => 'textfield',
     '#title' => t('Redirect URI'),
-    '#description' => t('Redirect URI from Instagram account'),
+    '#description' => t('Redirect URI from your Instagram Account.'),
     '#default_value' => variable_get('socialfeed_instagram_redirect_uri'),
     '#size' => 60,
     '#maxlength' => 100,
@@ -253,7 +248,7 @@ function socialfeed_instagram_settings($form, &$form_state) {
     '#type' => 'item',
     '#title' => t('Generate Instagram Access Token'),
     '#description' => t('Access this URL in your browser https://instagram.com/oauth/authorize/?client_id=&lt;your_client_id&gt;&redirect_uri=&lt;your_redirect_uri&gt;&response_type=token, you will get the access token.'),
-    '#markup' => t('Check <a href="@this" target="@blank">this</a> article.', array('@this' => url('http://jelled.com/instagram/access-token'), '@blank' => '_blank')),
+    '#markup' => t('Click <a href="@here" target="@blank">here</a> for more details.', array('@here' => url('https://gist.github.com/hemangigokhale/156db13c70840f076d766cd2b3976276#generate-an-instagram-access-token'), '@blank' => '_blank')),
   );
   $form['socialfeed_instagram_access_token'] = array(
     '#type' => 'textfield',
