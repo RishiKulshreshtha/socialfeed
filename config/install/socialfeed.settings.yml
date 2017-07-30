@@ -1,0 +1,19 @@
+# socialfeed_facebook_no_feeds: 10
+# socialfeed_facebook_all_types: true
+# socialfeed_facebook_display_pic: true
+# socialfeed_facebook_display_video: true
+# socialfeed_facebook_trim_length: 120
+# socialfeed_facebook_teaser_text: 'Read More'
+# socialfeed_facebook_hashtag: true
+# socialfeed_facebook_time_stamp: false
+# socialfeed_facebook_time_format: d-M-Y
+# socialfeed_twitter_tweets_count: 3
+# socialfeed_twitter_hashtag: false
+# socialfeed_twitter_time_stamp: false
+# socialfeed_twitter_time_format: d-M-Y
+# socialfeed_twitter_time_ago: false
+# socialfeed_twitter_trim_length: 120
+# socialfeed_twitter_teaser_text: 'View Media on Twitter'
+# socialfeed_instagram_picture_count: 1
+# socialfeed_instagram_picture_resolution: thumbnail
+# socialfeed_instagram_post_link: false

@@ -1,0 +1,5 @@
+# socialfeed.facebook_settings:
+#   route_name: socialfeed.facebook_settings
+#   title: 'Social Feed Settings'
+#   description: 'Configure to fit clients needs'
+#   parent: system.admin_config_services
