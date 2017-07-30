@@ -1,5 +1,5 @@
-# socialfeed.facebook_settings:
-#   route_name: socialfeed.facebook_settings
-#   title: Facebook
-#   weight: 0
-#   base_route: socialfeed.facebook_settings
+socialfeed.facebook_settings:
+  route_name: socialfeed.facebook_settings
+  title: Facebook
+  weight: 0
+  base_route: socialfeed.facebook_settings

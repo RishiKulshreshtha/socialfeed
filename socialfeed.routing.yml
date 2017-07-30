@@ -1,7 +1,7 @@
-# socialfeed.facebook_settings:
-#   path: /admin/config/services/socialfeed
-#   defaults:
-#     _title: 'Social Feed Settings'
-#     _form: \Drupal\socialfeed\Form\SocialfeedFacebookSettings
-#   requirements:
-#     _permission: 'administer modules'
+socialfeed.facebook_settings:
+  path: /admin/config/services/socialfeed
+  defaults:
+    _title: 'Social Feed Settings'
+    _form: \Drupal\socialfeed\Form\SocialfeedFacebookSettings
+  requirements:
+    _permission: 'administer modules'

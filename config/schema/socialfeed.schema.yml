@@ -1,42 +1,42 @@
-# socialfeed.settings:
-#   type: mapping
-#   label: Settings
-#   mapping:
-#     socialfeed_facebook_no_feeds:
-#       type: integer
-#     socialfeed_facebook_all_types:
-#       type: boolean
-#     socialfeed_facebook_display_pic:
-#       type: boolean
-#     socialfeed_facebook_display_video:
-#       type: boolean
-#     socialfeed_facebook_trim_length:
-#       type: integer
-#     socialfeed_facebook_teaser_text:
-#       type: string
-#     socialfeed_facebook_hashtag:
-#       type: boolean
-#     socialfeed_facebook_time_stamp:
-#       type: boolean
-#     socialfeed_facebook_time_format:
-#       type: string
-#     socialfeed_twitter_tweets_count:
-#       type: integer
-#     socialfeed_twitter_hashtag:
-#       type: boolean
-#     socialfeed_twitter_time_stamp:
-#       type: boolean
-#     socialfeed_twitter_time_format:
-#       type: string
-#     socialfeed_twitter_time_ago:
-#       type: boolean
-#     socialfeed_twitter_trim_length:
-#       type: integer
-#     socialfeed_twitter_teaser_text:
-#       type: string
-#     socialfeed_instagram_picture_count:
-#       type: integer
-#     socialfeed_instagram_picture_resolution:
-#       type: string
-#     socialfeed_instagram_post_link:
-#       type: boolean
+socialfeed.settings:
+  type: mapping
+  label: Settings
+  mapping:
+    socialfeed_facebook_no_feeds:
+      type: integer
+    socialfeed_facebook_all_types:
+      type: boolean
+    socialfeed_facebook_display_pic:
+      type: boolean
+    socialfeed_facebook_display_video:
+      type: boolean
+    socialfeed_facebook_trim_length:
+      type: integer
+    socialfeed_facebook_teaser_text:
+      type: string
+    socialfeed_facebook_hashtag:
+      type: boolean
+    socialfeed_facebook_time_stamp:
+      type: boolean
+    socialfeed_facebook_time_format:
+      type: string
+    socialfeed_twitter_tweets_count:
+      type: integer
+    socialfeed_twitter_hashtag:
+      type: boolean
+    socialfeed_twitter_time_stamp:
+      type: boolean
+    socialfeed_twitter_time_format:
+      type: string
+    socialfeed_twitter_time_ago:
+      type: boolean
+    socialfeed_twitter_trim_length:
+      type: integer
+    socialfeed_twitter_teaser_text:
+      type: string
+    socialfeed_instagram_picture_count:
+      type: integer
+    socialfeed_instagram_picture_resolution:
+      type: string
+    socialfeed_instagram_post_link:
+      type: boolean

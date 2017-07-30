@@ -1,8 +1,3 @@
-
-
-<!-- THEME DEBUG -->
-<!-- THEME HOOK: 'dmu_form' -->
-<!-- BEGIN OUTPUT from 'modules/contrib/drupalmoduleupgrader/templates/Form.html.twig' -->
 <?php
 
 namespace Drupal\socialfeed\Form;
@@ -217,6 +212,3 @@ class SocialfeedFacebookSettings extends ConfigFormBase {
   }
 
 }
-?>
-
-<!-- END OUTPUT from 'modules/contrib/drupalmoduleupgrader/templates/Form.html.twig' -->

@@ -1,0 +1,10 @@
+{% for item in items %}
+<ul class="something">
+  <li>{{ item.id }}</li>
+  <li>{{ item.created_time }}</li>
+  <li>{{ item.permalink_url }}</li>
+  <li>{{ item.type }}</li>
+  <li>{{ item.message }}</li>
+  <li>{{ item.source }}</li>
+</ul>
+{% endfor %}
